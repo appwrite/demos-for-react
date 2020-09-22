@@ -395,4 +395,4 @@ If you noticed I left out the Register section for this tutorial and that was in
 
 Good Luck! If you need any help feel free to join the [Discord](https://discord.gg/ZFwqr3S) or Refer to the [Appwrite Documentation](https://appwrite.io/docs). TIP: [Checkout account create documentation for the web API](https://appwrite.io/docs/client/account#create)
 
-(If you want to checkout the finished code is over on the [repository](https://github.com/appwrite/demos-for-react/example-auth) aswell as a mirror for this tutorial!)
+(If you want to checkout the finished code is over on the [repository](https://github.com/appwrite/demos-for-react/tree/master/example-auth) aswell as a mirror for this tutorial!)
