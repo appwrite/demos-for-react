@@ -23,7 +23,7 @@ Now find the Collection ID and keep it copied since we are going to need it.
 
 ## Development
 
-Enough with the theories, now let's move on to the real deal. Let's see how our React app is structured.
+Enough with the theories, now let's move on to the real deal. Let's see how our React application is structured.
 
 1. All the actions will be inside `/src/actions` directory
 2. All the components will be inside `/src/components` directory
@@ -623,7 +623,7 @@ const Users = () => {
 export default Users;
 ```
 
-What we are doing here is that we are getting the user data from the backend and list them inside a table. If the user wants to add a record to the database, they can click on the "Add User" button and a modal will be opened. Inside the modal the user can add the details and create a record. Also if the user wants to edit a record, they can do that by clicking on the relevant edit button and if the user wants to delete a record, they can do that by clicking the relevant delete button.
+What we are doing here is that we are getting the user data from the backend and list them inside a table. If the user wants to add a record to the database, they can click on the "Add User" button, and a modal will be opened. Inside the modal the user can add the details and create a record. Also, if the user wants to edit a record, they can do that by clicking on the relevant edit button and if the user wants to delete a record, they can do that by clicking the relevant delete button.
 
 Now let's see how the Appwrite SDK is used to do this awesome CRUD tasks. Let's create `/src/actions/index.js` file.
 
@@ -718,7 +718,243 @@ export {
 };
 ```
 
-In here we are creating the necessary actions to do the CRUD operations. First let's create function to add a record to the database. However, before this we need to add some database collection rules to the collection that we have created in the beginning of the tutorial. Follow this [documentation](https://appwrite.io/docs/rules) to add rules to the database collection. After adding rules we are good to go. To create the function to add a record follow [this](https://appwrite.io/docs/client/database?sdk=web#createDocument). When creating this function, you come across the situation where you have to specify permission to each document. To learn about the individual document permissions read [this](https://appwrite.io/docs/permissions). After that let's create the function to update a specific document. Follow [this](https://appwrite.io/docs/client/database?sdk=web#updateDocument) for that. Next let's create the delete function. To do that follow [this](https://appwrite.io/docs/client/database?sdk=web#deleteDocument). Finally, let's create the function to get all the records from the database. To do that follow [this](https://appwrite.io/docs/client/database?sdk=web#listDocuments). Now we have completed all our CRUD operations. Now let's see how our application works.
+In here we are creating the necessary actions to do the CRUD operations. First let's create function to add a record to the database. However, before this we need to add some database collection rules to the collection that we have created in the beginning of the tutorial.
+
+#### Rules and permissions in Appwrite
+
+This is the most important part in creating and managing documents in Appwrite. When we are creating a Collection in Appwrite the default permission to read and write is null. It means until we provide specific permissions, we cannot do any CRUD operations. The two basic categories of permissions are as follows.
+
+`Read` - Read (Listing documents) permission for the documents in the collection
+
+`Write` - Write (Create, Update, and Delete documents) permission for the documents in the collection
+
+Under this two basic permission categories, Appwrite has defined a set of permissions. For our application I have selected the `Wildcard` permission which means it gives public access for read and write to the collection. The following are the permissions types for `Read` and `Write`.
+
+| Type                      | Description                                                   |
+| ------------------------- | ------------------------------------------------------------- |
+| \*                        | Wildcard permission (public read or write access)             |
+| user:\[USER_ID\]          | Access to a specific user by their user-ID.                   |
+| team:\[TEAM_ID\]          | Access to any member of the specific team.                    |
+| team:\[TEAM_ID\]/\[ROLE\] | Access to any member who possesses a specific role in a team. |
+| member:\[MEMBER_ID\]      | Access to a specific member of a team.                        |
+
+For more information about `Teams` and `Roles` please follow the [Teams](https://appwrite.io/docs/client/teams) documentation. The above table is an excerpt of the main documentation, and for more information, follow the comprehensive documentation of [Appwrite Permissions](https://appwrite.io/docs/permissions).
+
+Now let's add read and write permissions for our collection.
+
+For the `Users` collection, I have set the read and write permissions as `Wildcard` which means anyone can read and write to the collection. However, remember, in a production application, this is a bad practice. Always protect your collections like cash 😁.
+
+![image](./add-permissions.gif)
+
+Now remember, we have only set read and write permissions to the `Users` collection. We have to add rules for our collection as well. Rules in a collection are used to structure the data in a document. With specifying the rules we can validate the input before saving it in the database. Recall `MongoDB Document Schemas`, and Appwrite document rules are somewhat similar.
+
+In my `Users` collection, the document structure is as follows.
+
+```json
+{
+  "userID": "#123",
+  "name": "John",
+  "email": "john@gmail.com"
+}
+```
+
+In each field, I have to specify the `label`, `key`,`type`,`required` from Appwrite console. The following is an excerpt from the [main documentation](https://appwrite.io/docs/rules).
+
+| Name     | Required | Type    | Description                                                                                                                         |
+| -------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| label    | yes      | string  | Rule display name.                                                                                                                  |
+| key      | yes      | string  | Rule name. No special characters and no spaces. Max 32 chars.                                                                       |
+| type     | yes      | string  | [Rule key type](https://appwrite.io/docs/rules#types). <br> \["text","numeric","boolean","wildcard","url","email","ip","document"\] |
+| default  | yes      | any     | Default value for this rule type.                                                                                                   |
+| required | yes      | boolean | Decide if this rule value is required in order to pass document validation.                                                         |
+
+For our `User` collection, I have selected the following rule type for each field.
+
+```json
+{
+  "userID": {
+    "label": "User-ID",
+    "key": "userID",
+    "type": "text",
+    "required": true
+  },
+  "name": {
+    "label": "Name",
+    "key": "name",
+    "type": "text",
+    "required": true
+  },
+  "email": {
+    "label": "Email",
+    "key": "email",
+    "type": "email",
+    "required": true
+  }
+}
+```
+
+Now let's add these rules to our collection from the Appwrite console.
+
+![image](./add-rules.gif)
+
+Since we have moved the heavy stuff, let's move on to creating the functions to implement the CRUD operations.
+
+#### Create a record
+
+To create a record we have to use the Appwrite's Create Document API endpoint. The SDK provides a function for this. Let's implement it.
+
+```js
+const creatUserDocument = async userData => {
+  try {
+    return appwrite.database.createDocument(
+      collectionID, //collection-id where the record is stored
+      userData, //the record itself
+      ["*"], //read permissions (here we provide the "Wildcard " permission)
+      ["*"] //write permissions (here we provide the "Wildcard " permission)
+    );
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+```
+
+In this `appwrite.database.createDocument` function we have to provide four required parameters.
+
+1. CollectionID
+2. The data of the record (A JSON object containing all the record data)
+3. Read Permissions for this specific record. (Provided in an array)
+4. Write Permissions for this specific record. (Provided in an array)
+
+As read write permissions of each record, I have given `Wildcard` permissions, which means it is publicly accessible for read and write. For more information about Create Document function, you can refer to the [main documentation](https://appwrite.io/docs/client/database?sdk=web#createDocument). When we are creating a document, the database will automatically create a `documentID` for the record. This `documentID` is needed when updating or deleting a document.
+
+After Create Document function is called, upon success, the response will be this.
+
+```json
+{
+  "$id": "5f6afdd185b8e",
+  "$permissions": { "read": ["*"], "write": ["*"] },
+  "userID": "#123",
+  "name": "Ed Sheeran",
+  "email": "ed.sheeran@gmail.com",
+  "$collection": "5f69c0a24b1cb"
+}
+```
+
+Keep in mind that, `$id` is the `documentID` of the created document.
+
+#### Read (list) the records
+
+Since we have created a record, we can list the records from the database. To do this let's implement List Documents function.
+
+```js
+const getUserDocuments = async () => {
+  try {
+    return appwrite.database.listDocuments(collectionID);
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+```
+
+This function is pretty straightforward, we only have to provide the `collectionID`. For more information about listing documents you can go through the [documentation](https://appwrite.io/docs/client/database?sdk=web#listDocuments).
+
+The response of List Documents function is as follows.
+
+```json
+{
+  "$id": "5f69c0a24b1cb",
+  "$collection": 0,
+  "$permissions": { "read": ["*"], "write": ["*"] },
+  "name": "users",
+  "dateCreated": 1600766114,
+  "dateUpdated": 1600843736,
+  "structure": true,
+  "sum": 2,
+  "documents": [
+    {
+      "$id": "5f6a3c0f982c8",
+      "$collection": "5f69c0a24b1cb",
+      "$permissions": { "read": ["*"], "write": ["*"] },
+      "userID": "#1234",
+      "name": "John Smith",
+      "email": "john.smith@gmail.com"
+    },
+    {
+      "$id": "5f6a3ef2ee1e7",
+      "$collection": "5f69c0a24b1cb",
+      "$permissions": { "read": ["*"], "write": ["*"] },
+      "userID": "#12345",
+      "name": "Jason Drake",
+      "email": "jason.drake@gmail.com"
+    }
+  ]
+}
+```
+
+Keep in mind that the `$id` in the parent object is the CollectionID. All the documents are listed under the `documents` field. Each object inside `documents` array represents a record in the `Users` collection. So the `documentID` of each document is denoted as `$id` in each object inside `documents` array.
+
+#### Update a record
+
+We can update a specific record using Update Document function.
+
+```js
+const updateUserDocument = async ({ documentID, name, email }) => {
+  try {
+    return appwrite.database.updateDocument(
+      collectionID, //the collection-id
+      documentID, //the document-id of the record that we are updating
+      { name, email }, //fields and data that needs to be updated in the record
+      ["*"], //read permissions (here we provide the "Wildcard " permission)
+      ["*"] //write permissions (here we provide the "Wildcard " permission)
+    );
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+```
+
+In this `appwrite.database.updateDocument` function we have to provide five required parameters.
+
+1. CollectionID
+2. DocumentID
+3. The data of the record to be updated (A JSON object containing all the record data to be updated)
+4. Read Permissions for this specific record. (Provided in an array)
+5. Write Permissions for this specific record. (Provided in an array)
+
+By providing new read and write permissions, we can update the permission for a specific record by providing its DocumentID. For more information, you can refer the [documentation](https://appwrite.io/docs/client/database?sdk=web#updateDocument).
+
+The response from Update Document function is as follows. It is similar to the response from Create Document function.
+
+```json
+{
+  "$id": "5f6afdd185b8e",
+  "$permissions": { "read": ["*"], "write": ["*"] },
+  "$collection": "5f69c0a24b1cb",
+  "userID": "#123",
+  "name": "John Samuel",
+  "email": "jsamuel@gmail.com"
+}
+```
+
+#### Delete a record
+
+Finally, we have come to the end of the line. We can now delete a record. To do this let's implement Delete Document function.
+
+```js
+const deleteUserDocument = async documentID => {
+  try {
+    return appwrite.database.deleteDocument(collectionID, documentID);
+  } catch (e) {
+    console.error(e.message);
+  }
+};
+```
+
+This function is also pretty straightforward. We only have to provide the `collectionID` and the `documentID`. For more information, you can refer the [documentation](https://appwrite.io/docs/client/database?sdk=web#deleteDocument).
+
+The response from successful deletion of a record is only the `HTTP 204` message, and it does not provide any `JSON` response.
+
+Now we have completed all our CRUD operations. Now let's see how our application works.
 
 ### Login
 
