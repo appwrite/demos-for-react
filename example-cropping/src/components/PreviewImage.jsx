@@ -1,10 +1,7 @@
 import React from 'react';
 
 class PreviewImage extends React.Component {
-  constructor (props) {
-    super(props);
   
-  };
 
  
 

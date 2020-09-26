@@ -1,42 +1,40 @@
-import React from 'react';
-
-class UploadImage extends React.Component {
-  constructor (props) {
-    super(props);
-  this.state={loading:false,
-file:null,
-error:false};
-  };
-
- processUpload=async ()=>{
-console.log(this.state.file)
-try{
-let promise = await this.props.appwrite.storage.createFile(this.state.file, [], []);
-console.log(promise)
-}catch(e){
-    console.log(e.message)
-this.state.error=e.message
-}
+import React, { useState } from 'react';
 
 
 
- }
-onFileChange= e => {
-this.state.file=e.target.files[0]
-}
-  render () {
-    
+function UploadImage(props) {
+  const [loading, setLoading] = useState(false);
+  const [uploadFile, setUploadFile] = useState(null);
+  const [error, setError] = useState(false);  
+
+  let processUpload = async (props) => {
+    setLoading(true)
+    try {
+      let promise = await props.appwrite.storage.createFile(uploadFile, [], []);
+      setLoading(false)
+    } catch (e) {
+      setLoading(false)
+      setError(e.message)
+    }
+  
+  
+  
+  }
+  let onFileChange = e => {
+    setUploadFile(e.target.files[0])
+  }  
+
     return (
       <div>
         <h1>Upload Image</h1>
-    {this.state.error && <p>error</p>}
-         <input type="file" onChange={this.onFileChange} /> 
-          
-          <button onClick={() => {this.processUpload()} } >Upload</button>
-        
+        {error && (<p>{error}</p>)}
+        <input type="file" onChange={onFileChange} />
+
+        <button disabled={loading} onClick={() => { processUpload(props) }} >Upload</button>
+
       </div>
     )
-  }
+  
 };
 
 export { UploadImage };
