@@ -1,20 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-class PreviewImage extends React.Component {
-  
+function PreviewImage(props) {
 
- 
+  function getImage(id){
 
-  render () {
-    
-    return (
-      <div>
-        <h1>Preview and Crop Image</h1>
-        
-        
-      </div>
-    )
+    let mWidth=props.width || null;
+    let mHeight=props.height || null;
+    let mQuality=props.quality || 100;
+    let mBackground=props.background || null;
+    let mOutput=props.output || null;
+    let image=props.appwrite.storage.getFilePreview(id,mWidth,mHeight,mQuality,mBackground,mOutput);
+
+
+    return image
   }
+
+    return (
+      
+<img src={props.id?getImage(props.id):""} />
+      
+      
+         )
+  
 };
 
 export { PreviewImage };

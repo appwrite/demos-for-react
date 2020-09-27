@@ -1,5 +1,5 @@
 # Appwrite + ReactJS =❤️
-This example is to showcase [Appwrite's JS API](https://github.com/appwrite/sdk-for-js) with [React](https://reactjs.org/) by creating a simple login/register page.
+This example is to showcase [Appwrite's JS API](https://github.com/appwrite/sdk-for-js) with [React](https://reactjs.org/) by creating a Simple image cropping examples and tutorial.
 
 ## Prerequisites
 
@@ -25,388 +25,524 @@ This should launch a server on `localhost:3000` with Live Reload.
 ## Introducing the Appwrite SDK
 With the boilerplate now complete we can now initialise the Appwrite SDK in the project before working on the login page. To keep things clean we will initialise this in it's own file, we will create this file in `src/` and call it `utils.js`. Within this file go ahead and paste the following code:
 ```js
-import 'appwrite'; // Import the appwrite library
-const appwrite = new window.Appwrite(); // The reason we use window.Appwrite() is for compatability with <script> imported appwrite.
-appwrite
-  .setEndpoint('http://localhost/v1') // We set the endpoint, change this if your using another endpoint URL.
-  .setProject('ProjectID'); // Here replace 'ProjectID' with the project ID that you created in your appwrite installation.
+import 'appwrite';
+const appwrite = new window.Appwrite();
+function appWrite({ endpoint, projectId }) {
+  let ep = endpoint || 'http://localhost/v1';
+  let pi = projectId || 'ProjectID';
+  return appwrite
+    .setEndpoint(ep)
+    .setProject(pi)
 
-export default { appwrite }; // Finally export the appwrite object to be used in projects.
+}
+export { appWrite };
+
 ```
-A deeper inspection of this code can be found in the comments within it, 
 
 TL:DR: Create a appwrite SDK Instance and initalise it with the endpoint and ProjectID of the project we are working with then export this for usage outside of the file.
 
-## Creating the App.js
-We are now going to replace the `src/App.js` with our own, doing so we will turn the object from a function react component to a class based one aswell as adding a bunch of logic to the app which will be used later by components.
+## Step 1 - Create SignUp Component
+
+This component is used for sign up to our appwrite server using appwrite SDK in order to login you should sign up first to appwrite SDK.
 
 ```js
-import React from 'react';
-import { appwrite } from './utils';
-import './App.css';
 
-import { PreviewImage } from './components/PreviewImage';
+import React, { useState } from 'react';
+
+function SignUp(props) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
 
-class App extends React.Component {
-  constructor (props) {
-    super(props);
-    this.state = { // Create the variables we will use later.
-      userprofile: false,
-      error: false
-    };
-  };
 
-  // Get userdata function.
-  async getUserdata () {
-    try {
-      const response = await appwrite.account.get(); // Request to appwrite server to see if we are logged in.
-      this.setState({ userprofile: response }); // If Logged in then set the returned profile to the userprofile variable in state.
-    } catch (err) { // If we are not logged in or another error occoured then catch(err)
-      if (err.toString() === 'Error: Unauthorized') return; // If not logged in then do nothing.
-      this.setState({ error: err.toString() }); // If it's another error then set the error variable in state.
-      console.error(err); // and also console.error the error for clearer debugging.
+  async function processSignUp(event) {
+    event.preventDefault()
+
+    if (loading) return;
+
+
+    setError(false)
+    setLoading(true)
+
+    if (!(password.length >= 6 && password.length <= 32)) {
+
+      setError('Error: Password must be between 6 and 32 characters.')
+      setLoading(true)
+
+      return;
     }
+
+    await props.signUpFunc(email, password);
+
+
+    setLoading(false)
   }
 
-  // Login function
-  async login (email, password) {
-    try {
-      // Set error to false so if we are successful the error doesn't perist making bad UX Design.
-      // also set the loading prop to true to signal to the user we are processing his request.
-      await this.setState({ error: false })
 
-      // Create the session, if this fails it will error and be caught by the catch(err).
+  return (
+    <div style={{ display: props.currentPage ? "none" : "block" }} >
+
+      <h1>Sign Up</h1>
+      {props.error().type === "signUp" && (
+        <p className='error'>{props.error().message}</p>
+      )}
+      <form onSubmit={(e) => processSignUp(e)}>
+        <input onChange={(event) => setEmail(event.target.value)} type='email' id='email' required placeholder='Email' />
+        <input onChange={(event) => setPassword(event.target.value)} type='password' id='password' required placeholder='Password' />
+        <button disabled={loading} type='submit'>Sign Up</button>
+      </form>
+    </div>
+  )
+
+};
+
+export { SignUp };
+```
+
+so what this does is process the sign up thorough props then if success it will go to login and if it fails it will throw an error.
+
+## Step 2 - Create Login Component
+
+So in order for us to crop an image we should first have file in our storage, to do that we can either upload it to storage through appwrite dashboard, or we can create a login page then upload it and then crop the image using appwrite server. This tutorial will use the second one so you will learn how to login, upload, and crop the image using appwrite sdk. First of all we create the login component.
+
+```js
+
+import React, { useState } from 'react';
+
+function Login(props) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  async function processLogin(event) {
+    event.preventDefault()
+
+    if (loading) return;
+
+    setLoading(true)
+    await props.loginFunc(email, password);
+
+
+    setLoading(false)
+  }
+
+
+  return (
+    <div style={{ display: props.currentPage ? "block" : "none" }}>
+      <h1>Login</h1>
+
+      {props.error().type === "login" && (
+        <p className='error'>{props.error().message}</p>
+      )}
+      <form onSubmit={(e) => processLogin(e)}>
+        <input onChange={(event) => setEmail(event.target.value)} type='email' id='email' required placeholder='Email' />
+        <input onChange={(event) => setPassword(event.target.value)} type='password' id='password' required placeholder='Password' />
+        <button disabled={loading} type='submit'>Sign In</button>
+      </form>
+    </div>
+  )
+
+};
+
+export { Login };
+```
+
+here we create a functional component that has another function called ```processLogin``` which will process our login through ```props.loginFunc``` if it's success it will go to our main page if it doesn't it will throw an authorized error.
+
+## Step 3 - Create UploadImage Component
+
+UploadImage component is used for uploading component through appwrite SDK so after we login in order for us to crop an image we should upload our image so that we can crop it later
+
+```js
+import React, { useState } from 'react';
+
+function UploadImage(props) {
+  const [loading, setLoading] = useState(false);
+  const [uploadFile, setUploadFile] = useState(null);
+  const [error, setError] = useState(false);
+
+  let processUpload = async (props) => {
+    setLoading(true)
+    try {
+      let promise = await props.appwrite.storage.createFile(uploadFile, ['*'], ['*']);
+      setLoading(false)
+    } catch (e) {
+      setLoading(false)
+      setError(e.message)
+    }
+
+
+
+  }
+  let onFileChange = e => {
+    setUploadFile(e.target.files[0])
+  }
+
+  return (
+    <div>
+      <h1>Upload Image</h1>
+      {error && (<p>{error}</p>)}
+      <input type="file" onChange={onFileChange} />
+
+      <button disabled={loading} onClick={() => { processUpload(props) }} >Upload</button>
+
+    </div>
+  )
+
+};
+
+export { UploadImage };
+```
+
+## Step 4 - Create ListImage Component
+
+So after we done uploading our image we want to see all of our image that we upload right? so in order to do that we create a ```ListImage``` component so that we can show our image from the server
+
+```js
+import React, { useState, useEffect } from 'react';
+import { PreviewImage } from "./PreviewImage"
+
+function ListImage(props) {
+  const [listImages,setListImages]=useState([])
+  const [active, setActive] = useState(null)
+  async function getAllImages() {
+    let images = await props.appwrite.storage.listFiles();
+    let me=[...images.files];
+   
+    setListImages(me)
+
+  }
+
+  useEffect(() => {
+    getAllImages()
+
+  }, []);
+  useEffect(() => {
+
+
+  }, [active]);
+ 
+  async function selectImage(e, id, index) {
+
+    setActive(index)
+    props.changeImage(id)
+
+  }
+  return (
+    <div>
+      <h1>List Image</h1>
+      <button onClick={()=>getAllImages()}>refresh list</button>
+      {listImages?.length && listImages.length > 0 ? listImages.map((a, index) => {
+        a.color = active === index ? "solid" : "none";
+
+        return (
+          <div key={index} style={{ display: "inline-block", border: a.color, cursor: "pointer" }} onClick={(e) => selectImage(e, a.$id, index)}>
+
+            <PreviewImage width={300} output={"webp"} appwrite={props.appwrite} id={a.$id} />
+          </div>
+
+        )
+      }) : ""}
+    </div>
+  )
+
+};
+
+export { ListImage };
+
+```
+
+There is two important function here which is ```getAllImages``` and ```selectImage``` what is that? so we create ```getAllImages``` so that we can get a list of image that we upload from our server and then we also create ```selectImage``` here so that we can select which of the image that we want to crop for later.
+
+## Step 5 - Create PreviewImage Component
+
+So this is actually the main ingredient in our tutorial what this does is to show the preview of the image in our server and return in a spesific parameter that we want so in order to use this component we can pass the parameter exactly the same as in the appwrite SDK documentation which is id,width,height,quality,background,and output and it will output the image in that spesific condition which mean this component is used for cropping an image that we get from our storage.
+
+```js
+import React, { useState } from 'react';
+
+function PreviewImage(props) {
+
+  function getImage(id){
+
+    let mWidth=props.width || null;
+    let mHeight=props.height || null;
+    let mQuality=props.quality || 100;
+    let mBackground=props.background || null;
+    let mOutput=props.output || null;
+    let image=props.appwrite.storage.getFilePreview(id,mWidth,mHeight,mQuality,mBackground,mOutput);
+
+
+    return image
+  }
+
+    return (<img src={props.id?getImage(props.id):""} />)
+  
+};
+
+export { PreviewImage };
+```
+
+## Step 6 - Create PreviewAndCrop Component
+
+So what this component does is to preview how the image will look like after we crop it which means how if the we change the width to 100 how if we change quality to 20 and etc. This component does all that.
+
+```js
+import React, { useState } from 'react';
+import {PreviewImage} from "./PreviewImage"
+function PreviewAndCrop(props) {
+  const [width,setWidth]=useState(null)
+  const [height,setHeight]=useState(null)
+  const [quality,setQuality]=useState(null)
+  const [background,setBackground]=useState(null)
+  const [output,setOutput]=useState(null)
+  
+ return (
+   <div>
+<h1>Preview and Crop Image</h1>
+width : <input onChange={(e)=>setWidth(e.target.value)} type="range" min="0" max="4000"  /> {width}
+height : <input onChange={(e)=>setHeight(e.target.value)} type="range" min="0" max="4000"  /> {height}
+quality : <input onChange={(e)=>setQuality(e.target.value)} type="range" min="0" max="100"  /> {quality}
+background : <input type="color" onChange={(e)=>setBackground(e.target.value.replace("#",""))}/>
+output : <select onChange={(e)=>setOutput(e.target.value)}>
+  <option value="jpeg">jpeg</option>
+  <option value="jpg">jpg</option>
+  <option value="png">png</option>
+  <option value="gif">gif</option>
+  <option value="webp">webp</option>
+</select>
+<PreviewImage appwrite={props.appwrite} width={width} height={height} quality={quality} background={background} output={output} id={props.imageId} />
+   </div>
+  
+ )
+  
+};
+
+export { PreviewAndCrop };
+```
+
+## Step 7 - Putting it all together in App.js
+
+So in order for this application to work we should put all of our component into ```App.js``` so that we can see how our cropped image looks like
+
+```js
+import React, { useState, useEffect } from 'react';
+import { appWrite } from './utils';
+import { PreviewAndCrop } from './components/PreviewAndCrop';
+import { ListImage } from './components/ListImage';
+import { UploadImage } from './components/UploadImage';
+import { Login } from './components/Login';
+import { SignUp } from './components/SignUp';
+
+function App() {
+  const [appwrite, setAppwrite] = useState(appWrite({ endpoint: "http://localhost:4000/v1", projectId: "5f6f49028c5b9" }))
+  const [userProfile, setUserProfile] = useState(false);
+  const [error, setError] = useState(false);
+  const [currentPage, setCurrentPage] = useState(true);
+  const [imageId, setImageId] = useState(null);
+  async function getUserData() {
+    try {
+      const response = await appwrite.account.get();
+      setUserProfile(response)
+    } catch (err) {
+      console.log(err)
+    }
+  }
+  async function login(email, password) {
+    try {
+      setError(false)
       await appwrite.account.createSession(
         email,
         password
       );
-      // If all is successful then get the userdata.
-      this.getUserdata();
+      getUserData();
     } catch (err) {
-      await this.setState({ error: 'Invalid Credentials' }) // If login fails then show user the login was not successful.
-      console.error(err) // also console error for debugging purposes.
+      console.log(err.message)
+      setError({ type: "login", message: err.message })
+
+
+    }
+  }
+  async function signUp(email, password) {
+    try {
+
+
+      setError(false)
+
+
+      await appwrite.account.create(
+        email,
+        password
+      );
+      setCurrentPage(true)
+
+    } catch (err) {
+      setError({ type: "signUp", message: err.message })
+
     }
   }
 
-  // Logout the user function.
-  async logout () {
-    await this.setState({ userprofile: false }); // Remove the local copy of the userprofile causing the app to see that the user is not logged in.
-    appwrite.account.deleteSession('current'); // Tell appwrite server to remove current session and complete the logout.
+  async function logout() {
+    await setUserProfile(false);
+    appwrite.account.deleteSession('current');
   }
+  useEffect(() => {
 
-  componentDidMount () {
-    this.getUserdata(); // On page load check if we are already logged in.
+    getUserData()
+  }, []);
+
+  function changeImage(id) {
+    setImageId(id)
   }
+  return (
+    <div>
 
-  render () {
-    return (
-      <div>
-        <div className='loginCore'>
-          {!this.state.userprofile && (
-            <div className='loginPage'>
-              <Login loginFunc={(email, password) => this.login(email, password)} error={() => this.state.error} />
-              <div className='loginSwitchContainer'>
-                <p>{this.state.currentPage ? 'Got an account?' : "Haven't got an account?"}</p>
-                <span onClick={() => this.setState({ currentPage: !this.state.currentPage })}>{this.state.currentPage ? 'Login' : 'Sign Up'}</span>
-              </div>
-            </div>
-          )}
-          {this.state.userprofile && (
-            <div className='loginPage'>
-              <Profile userprofile={this.state.userprofile} logout={() => this.logout()} />
-            </div>
-          )}
+      {!userProfile && (
+        <div className='loginPage'>
+          <Login currentPage={currentPage} loginFunc={(email, password) => login(email, password)} error={() => error} />
+          <SignUp currentPage={currentPage} signUpFunc={(email, password) => signUp(email, password)} error={() => error} />
+          <div className='loginSwitchContainer'>
+            <p>{currentPage ? "Haven't got an account?" : 'Got an account?'}</p>
+            <button onClick={() => setCurrentPage(!currentPage)}>{currentPage ? 'Sign Up' : 'Login'}</button>
+          </div>
         </div>
-      </div>
-    )
-  }
+      )}
+      {userProfile && (
+        <div>
+          <UploadImage appwrite={appwrite} />
+          <ListImage appwrite={appwrite} changeImage={(id) => changeImage(id)} />
+          <PreviewAndCrop imageId={imageId} appwrite={appwrite} />
+
+          <button onClick={() => logout()}>LOGOUT</button>
+        </div>
+
+      )}
+
+    </div>
+  )
+
 };
 
 export default App;
 ```
-Now this is alot to take in we will attempt to break this down and explain what all this code does.
 
-First we create a new class based off React.Component which allows us to create our custom App component we also go ahead and import the earlier created appwrite object from `utils.js`.
+i will explain one by one what does this component do so first of all we import all of the component that we create earlier 
 
-in `constructor(props)` we use `super(props)` to call the parents constructor, in this tutorial you do not have to know exactly what `super()` is used for, all you need to know is that it allows us to use `this`. 
-
-Next we will create `this.state` in react this is how we store data in components and rerender when things get changed with `this.setState()`
-
-We now create a couple functions which allow us to interact with the appwrite instance using the SDK, I'll explain them now.
-
-### `getUserdata()` 
-1. The function will contact the appwrite instance and check if we are logged in.
-2. If we are logged in then we will set the `userprofile` variable in state to tell the rest of the app that we are logged in.
-3. If we are not logged in then it will simply return,
-First we function we create will check if we are logged in and if so sets the `userprofile` variable in state to it Iit will also null all the input variables as a security precaution). If we are not logged in it will simply return. If another error is encountered it will set the error variable in state to show the user the error and log the error in console.
-
-### `login()`
-
-1. Check that a previous request is not being processed by checking the loading variable in state. If it is then a new request isn't started.
-2. Sets the error variable in state to false and the loading variable to true to prevent new request from being created during this request.
-3. Then the funciton will attempt to create a new session with the credentials provided by the user. If this is successful then `getUserdata()` is called and it will get the profile and tell the rest of the app that the user is logged in.
-4. If the login function fails then it will throw a `Invalid Credentials` error and let the user know that their credentials we're invalid.
-
-### logout()
-Thankfully this function is pretty simple. It will set the `userprofile` state variable to false then tell appwrite to invalidate the session it was holding to complete the logout.
-
-With that all appwrite related functions are finished and we can continue to the components.
-
-## Creating the login and profile components
-At the moment we have all the logic to create our login page but we don't yet have the actual forms at the moment it just says `Hello World!` and you can't login with that! So now we will create two new components. First we will create the login one.
-
-### Creating the Login Component
-Go ahead and create a folder as `src/components/` this is where we will store the components we will be creating. Now in `src/components/` create a new file called `Login.jsx`(The .jsx is not a typo, it's a extension type for JSX Files used in React. [See more here](https://reactjs.org/docs/introducing-jsx.html))
-
-```JSX
-import React from 'react';
-
-class Login extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            email: '',
-            password: '',
-            loading: false
-        };
-    };
-
-    async processLogin(event) {
-        event.preventDefault() // Prevent default to prevent reloading of page.
-
-        if (this.state.loading) return; // If loading then return.
-
-        await this.setState({
-            error: false,
-            loading: true
-        }); // Start new request by removing any previous errors and setting loading to true
-
-        // Validation
-        if (!(this.state.password.length >= 6 && this.state.password.length <= 32)) {
-            // If validation incorrect then set error and then set loading to false
-            this.setState({
-                error: 'Error: Password must be between 6 and 32 characters.',
-                loading: false
-            });
-            return;
-        }
-
-        await this.props.loginFunc(this.state.email, this.state.password); // Request login
-
-        // If success then set loading to false
-        await this.setState({
-            loading: false
-        });
-    }
-
-    render() {
-        const error = this.state.error || this.props.error()
-        return (
-            <div>
-        <h1>Login</h1>
-        {error && (
-          <p className='error'>{error}</p>
-        )}
-        <form onSubmit={(e) => this.processLogin(e)}>
-          <input onChange={(event) => this.setState({ email: event.target.value })} type='email' id='email' required placeholder='Email' />
-          <input onChange={(event) => this.setState({ password: event.target.value })} type='password' id='password' required placeholder='Password' />
-          <button disabled={this.state.loading} type='submit'>Sign In</button>
-        </form>
-      </div>
-        )
-    }
-};
-
-export {
-    Login
-};
-```
-Now, lets explain this code. First we do create a new class from based off React.Component like last time and create a constructor with `super(props)` and a `this.state` with the variables we will use.
-
-Now we create a function called `processLogin(event)` all this does is:
-1. Calls event.preventDefault() to prevent a page refresh
-2. Set's error and loading to false in state
-3. Performs validation and if anything fails sets the Error variable in state then returns
-4. Runs `this.props.loginFunc`. Now this is different `this.props` is actually a way of us passing data and functions from parents to the children component, and here we pass a prop called `loginFunc` which will run the `login()` function from `src/App.js`. We'll explain this more when we start patching things together in App.js
-5. Once everything is done set loading to false in state and if everything is successful then `src/App.js` will switch the component being rendered to the Profile component that we will create next.
-
-Now, the render function uses JSX and all the render function does is create a form with some styling and has `onSubmit` to trigger the `processLogin()` function aswell as `onChange` to change the variables in state whenever the input changes, We also will disable the Sign In button if `this.state.loading` is to show the user that the request is being processed.
-
-### Creating the Profile Component
-Next we will create a new component for the Profile render, make a new file in the `src/components` directory and call it `Profile.jsx` then copy the following code:
-```JSX
-import React from 'react';
-
-class Profile extends React.Component {
-    render() {
-        return (
-            <div>
-	        <h2>Logged In!</h2>
-	        <h1>{this.props.userprofile.name}</h1>
-	        <p>{this.props.userprofile.email}</p>
-	        <p>ID: {this.props.userprofile.$id}</p>
-	        <button onClick={() => this.props.logout()}>Logout</button>
-	    </div>
-        )
-    }
-};
-
-export { Profile };
-```
-Notice how this code is significantly simpler than the others and that it doesn't have a `constructor()` this is because we don't need to add a state as we are not processing data with this component. All it does it render the data sent from the `userprofile` prop and offers a button that will call `this.props.logout()` when clicked.
-
-With that all our custom components are finished!
-
-## Combining it all together
-With all the components finished all we need to do now is add them into our main `App.js` and create the JSX to render it.
-
-First we want to import our shiny new components, in `src/App.js` go ahead and place the following under `import { appwrite } from './utils` near the top:
-```JS
-import  './App.css';
-
-import { Login } from './components/Login';
-import { Profile } from './components/Profile';
-```
-This will import the components we need aswell as add the styling from `app.css` that we removed earlier.
-
-Next we change the `render()` function to render some JSX that will render our custom components.
-Go ahead and find:
 ```js
-render() {
-  return (
+import React, { useState, useEffect } from 'react'; //react hooks for managing state
+import { appWrite } from './utils'; //to connect to our server
+import { ListImage } from './components/ListImage'; // to list all of our image
+import { PreviewAndCrop } from './components/PreviewAndCrop'; //to show the cropped image that we pick from ListImage component
+import { UploadImage } from './components/UploadImage'; // to upload image
+import { Login } from './components/Login'; // login
+import { SignUp } from './components/SignUp'; // sign up
+```
+
+so after that we create our state so that our component can re-render if there is some change in state
+
+```js
+ const [appwrite, setAppwrite] = useState(appWrite({ endpoint: "http://localhost:4000/v1", projectId: "5f6f49028c5b9" })) // this is for connecting to our appwrite server
+  const [userProfile, setUserProfile] = useState(false); //check if we are logegd in or not
+  const [error, setError] = useState(false); // check if there are error or not
+  const [currentPage, setCurrentPage] = useState(true); // change state between sign up and login
+  const [imageId, setImageId] = useState(null); // pick image from ListImage component
+```
+
+so after that we create a function that we use for connecting our app to our backend appwrite server
+
+```js
+async function getUserData() {
+    try {
+      const response = await appwrite.account.get();
+      setUserProfile(response)
+    } catch (err) {
+      console.log(err)
+    }
+  } // check if user already logged in or no 
+  async function login(email, password) {
+    try {
+      setError(false)
+      await appwrite.account.createSession(
+        email,
+        password
+      );
+      getUserData();
+    } catch (err) {
+      console.log(err.message)
+      setError({ type: "login", message: err.message })
+
+
+    }
+  } // login to server
+  async function signUp(email, password) {
+    try {
+
+
+      setError(false)
+
+
+      await appwrite.account.create(
+        email,
+        password
+      );
+      setCurrentPage(true)
+
+    } catch (err) {
+      setError({ type: "signUp", message: err.message })
+
+    }
+  } // sign up to server
+
+  async function logout() {
+    await setUserProfile(false);
+    appwrite.account.deleteSession('current');
+  } // logout from server
+
+  useEffect(() => {
+
+    getUserData()
+  }, []); // from the first time our page load check if user logged in show our main page if no go to login
+
+  function changeImage(id) {
+    setImageId(id)
+  } // change an image in PreviewAndCrop component
+```
+after that we can render our app using this code
+
+```js
+return (
     <div>
-      Hello World!
+
+      {!userProfile && (
+        <div className='loginPage'>
+          <Login currentPage={currentPage} loginFunc={(email, password) => login(email, password)} error={() => error} />
+          <SignUp currentPage={currentPage} signUpFunc={(email, password) => signUp(email, password)} error={() => error} />
+          <div className='loginSwitchContainer'>
+            <p>{currentPage ? "Haven't got an account?" : 'Got an account?'}</p>
+            <button onClick={() => setCurrentPage(!currentPage)}>{currentPage ? 'Sign Up' : 'Login'}</button>
+          </div>
+        </div>
+      )}
+      {userProfile && (
+        <div>
+          <UploadImage appwrite={appwrite} />
+          <ListImage appwrite={appwrite} changeImage={(id) => changeImage(id)} />
+          <PreviewAndCrop imageId={imageId} appwrite={appwrite} />
+
+          <button onClick={() => logout()}>LOGOUT</button>
+        </div>
+
+      )}
+
     </div>
   )
-}
 ```
-and replace it with:
-```js
-render() {
-    return (
-        <div>
-        <div className='loginCore'>
-          {!this.state.userprofile && (
-            <div className='loginPage'>
-              <Login loginFunc={(email, password) => this.login(email, password)} error={() => this.state.error} />
-              <div className='loginSwitchContainer'>
-                <p>{this.state.currentPage ? 'Got an account?' : "Haven't got an account?"}</p>
-                <span onClick={() => this.setState({ currentPage: !this.state.currentPage })}>{this.state.currentPage ? 'Login' : 'Sign Up'}</span>
-              </div>
-            </div>
-          )}
-          {this.state.userprofile && (
-            <div className='loginPage'>
-              <Profile userprofile={this.state.userprofile} logout={() => this.logout()} />
-            </div>
-          )}
-        </div>
-      </div>
-    )
-}
-```
-Now finally we will explain this JSX, `{!this.state.userprofile && (<div></div>)}` might get you scratching your head, but this is actually one of the features of JSX. It allows us to create if statements within our HTML so for instance this statement is essentially saying if not `this.state.userprofile` then render everything within the circle brackets and we also use brackets to use JS variables within text and to add the functions the components need as props.
-
-## Adding some style 😎
-Now, this is all cool but it doesn't look good. You could either style it yourself if your up for the challenge or edit `src/App.css` to add the following CSS I have created:
-```css
-html {
-  background: linear-gradient(90deg, rgba(209, 0, 176, 1) 0%, rgba(0, 249, 255, 1) 100%);
-  color: #333;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-}
-
-html,
-body,
-#root {
-  width: 100%;
-  height: 100%;
-}
-
-input,
-button,
-select,
-textarea {
-  font-family: inherit;
-  font-size: inherit;
-  -webkit-padding: 0.4em 0;
-  padding: 0.4em;
-  margin: 0 0 0.5em 0;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 2px;
-}
-
-.loginPage input {
-  display: block;
-  margin: 0 auto;
-  margin-bottom: 20px;
-}
-
-.loginCore {
-  position: absolute;
-  width: 300px;
-  background-color: white;
-  border-radius: 10px;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-50%);
-  text-align: center;
-}
-
-.loginCore span {
-  color: rgb(0, 162, 255);
-}
-
-.loginCore span:hover {
-  cursor: pointer;
-}
-
-.loginPage input {
-  display: block;
-  margin: 0 auto;
-  margin-bottom: 20px;
-}
-
-.loggedIn {
-  padding-top: 30px;
-  padding-bottom: 30px;
-}
-
-.loggedIn h1 {
-  margin: 0;
-}
-
-.loggedIn h2 {
-  margin: 0;
-}
-
-.loggedIn p {
-  margin: 10px;
-}
-
-.error {
-  color: red;
-}
-
-.loginSwitchContainer {
-  margin-top: 20px;
-  margin-bottom: 20px;
-}
-
-.loginSwitchContainer p {
-  margin: 0;
-  margin-bottom: 5px;
-}
-```
-This should leave you with a nice form and style with your brand new login app!
+so what this does is to check whether or not our user logged in if no go to login if yes go to our main page which is to crop and preview a cropped image
 
 ## What next?
 
-Congratulations! You've just created a login page using React and Appwrite! 🥳🥳🥳
-
-If you noticed I left out the Register section for this tutorial and that was intentional. This is where I hand it off to you and allow you to use the techniques and ideas you used creating this project to add your own register page!
+Congratulations! You've just created a image cropping page using React and Appwrite! 🥳🥳🥳
 
 Good Luck! If you need any help feel free to join the [Discord](https://discord.gg/ZFwqr3S) or Refer to the [Appwrite Documentation](https://appwrite.io/docs). TIP: [Checkout account create documentation for the web API](https://appwrite.io/docs/client/account#create)
 

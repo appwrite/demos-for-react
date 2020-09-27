@@ -1,16 +1,31 @@
 import React, { useState } from 'react';
 
-function Login(props) {
+function SignUp(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  async function processLogin(event) {
+  const [error, setError] = useState(false);
+
+
+
+  async function processSignUp(event) {
     event.preventDefault()
 
     if (loading) return;
 
+
+    setError(false)
     setLoading(true)
-    await props.loginFunc(email, password);
+
+    if (!(password.length >= 6 && password.length <= 32)) {
+
+      setError('Error: Password must be between 6 and 32 characters.')
+      setLoading(true)
+
+      return;
+    }
+
+    await props.signUpFunc(email, password);
 
 
     setLoading(false)
@@ -18,20 +33,20 @@ function Login(props) {
 
 
   return (
-    <div style={{ display: props.currentPage ? "block" : "none" }}>
-      <h1>Login</h1>
+    <div style={{ display: props.currentPage ? "none" : "block" }} >
 
-      {props.error().type === "login" && (
+      <h1>Sign Up</h1>
+      {props.error().type === "signUp" && (
         <p className='error'>{props.error().message}</p>
       )}
-      <form onSubmit={(e) => processLogin(e)}>
+      <form onSubmit={(e) => processSignUp(e)}>
         <input onChange={(event) => setEmail(event.target.value)} type='email' id='email' required placeholder='Email' />
         <input onChange={(event) => setPassword(event.target.value)} type='password' id='password' required placeholder='Password' />
-        <button disabled={loading} type='submit'>Sign In</button>
+        <button disabled={loading} type='submit'>Sign Up</button>
       </form>
     </div>
   )
 
 };
 
-export { Login };
+export { SignUp };
