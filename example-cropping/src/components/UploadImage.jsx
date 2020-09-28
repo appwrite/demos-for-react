@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import Button from "@material-ui/core/Button";
 function UploadImage(props) {
   const [loading, setLoading] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
@@ -27,8 +27,15 @@ function UploadImage(props) {
       <h1>Upload Image</h1>
       {error && (<p>{error}</p>)}
       <input type="file" onChange={onFileChange} />
-
-      <button disabled={loading} onClick={() => { processUpload(props) }} >Upload</button>
+      <Button
+          
+          variant="contained"
+          color="primary"
+          disabled={loading} onClick={() => { processUpload(props) }}
+        >
+         Upload
+        </Button>
+     
 
     </div>
   )

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {PreviewImage} from "./PreviewImage"
+import Grid from "@material-ui/core/Grid";
 function PreviewAndCrop(props) {
   const [width,setWidth]=useState(null)
   const [height,setHeight]=useState(null)
