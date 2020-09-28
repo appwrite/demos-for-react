@@ -40,26 +40,105 @@ export { appWrite };
 ```
 
 TL:DR: Create a appwrite SDK Instance and initalise it with the endpoint and ProjectID of the project we are working with then export this for usage outside of the file.
+## How To Use Cropping Using Appwrite SDK
 
-## Step 1 - Create SignUp Component
+To crop an image using appwrite SDK is actually pretty simple you just need to upload your file into appwrite storage then preview the image and pass the optional parameters, if you take a look at the js docs in https://appwrite.io/docs/client/storage#getFilePreview you will see all of the optional parameters and how to use it. Below is the example of how to use it using js SDK
+
+```js
+let sdk = new Appwrite();
+
+sdk
+    .setEndpoint('https://[HOSTNAME_OR_IP]/v1') // Your API Endpoint
+    .setProject('5df5acd0d48c2') // Your project ID
+;
+
+let result = sdk.storage.getFilePreview('[FILE_ID]',300,null,100,null,"webp");
+
+console.log(result); // Resource URL for example http://localhost/v1/storage/files/5f70694f8637d/preview?width=300&quality=100&output=webp&project=5f6f49028c5b9
+
+```
+
+using the above script we will get our image with the output that we like so for example we pass 300 as width,100 as quality and output webp we will get exactly the output like that without the need of cdn to change the width, height, quality ,background, and output the appwrite will do it just like we want. Now we will create a component that can implement this functionality using react, below is step by step how to create simple app that can crop our image from appwrite storage starting from signup, login, upload, list, then preview and crop.
+
+## Step 1 - Create PreviewImage Component
+
+So this is actually the main ingredient in our tutorial what this does is to show the preview of the image in our server and return in a spesific parameter that we want so in order to use this component we can pass the parameter exactly the same as in the appwrite SDK documentation which is id,width,height,quality,background,and output and it will output the image with that spesific condition which mean this component is used for cropping an image that we get from our storage.
+
+```js
+import React, { useState } from 'react';
+
+function PreviewImage(props) {
+
+  function getImage(id){
+
+    let mWidth=props.width || null;
+    let mHeight=props.height || null;
+    let mQuality=props.quality || 100;
+    let mBackground=props.background || null;
+    let mOutput=props.output || null;
+    let image=props.appwrite.storage.getFilePreview(id,mWidth,mHeight,mQuality,mBackground,mOutput);
+
+
+    return image
+  }
+
+    return (<img src={props.id?getImage(props.id):""} />)
+  
+};
+
+export { PreviewImage };
+```
+
+example usage
+
+```js
+<PreviewImage appwrite={props.appwrite} width={width} height={height} quality={quality} background={background} output={output} id={props.imageId} />
+```
+
+as you can see there is so many props there to use it actually the same as in the SDK but instead we implement it in react the different maybe there is ```appwrite``` props which is used for interacting with appwrite SDK
+
+## Step 2 - Create SignUp Component
 
 This component is used for sign up to our appwrite server using appwrite SDK in order to login you should sign up first to appwrite SDK.
 
 ```js
 
 import React, { useState } from 'react';
+import Button from "@material-ui/core/Button";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import TextField from "@material-ui/core/TextField";
+import Link from "@material-ui/core/Link";
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+import Alert from '@material-ui/lab/Alert';
+import { makeStyles } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    marginTop: theme.spacing(8),
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
+  },
+   form: {
+    width: "100%", // Fix IE 11 issue.
+    marginTop: theme.spacing(1)
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2)
+  }
+}));
+
 
 function SignUp(props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-
-
-
-  async function processSignUp(event) {
-    event.preventDefault()
-
+  const classes = useStyles();
+  async function signUp(e) {
+    e.preventDefault()
     if (loading) return;
 
 
@@ -73,90 +152,253 @@ function SignUp(props) {
 
       return;
     }
+    try {
 
-    await props.signUpFunc(email, password);
+      await props.appwrite.account.create(
+        email,
+        password
+      );
+      props.setCurrentPage(props.currentPage)
 
+    } catch (err) {
+      setError(err.message)
 
+    }
     setLoading(false)
   }
 
 
-  return (
-    <div style={{ display: props.currentPage ? "none" : "block" }} >
 
-      <h1>Sign Up</h1>
-      {props.error().type === "signUp" && (
-        <p className='error'>{props.error().message}</p>
-      )}
-      <form onSubmit={(e) => processSignUp(e)}>
-        <input onChange={(event) => setEmail(event.target.value)} type='email' id='email' required placeholder='Email' />
-        <input onChange={(event) => setPassword(event.target.value)} type='password' id='password' required placeholder='Password' />
-        <button disabled={loading} type='submit'>Sign Up</button>
+
+  return (
+    <Container component="main" maxWidth="xs"  style={{ display: props.currentPage ? "none" : "block" }}>
+    <CssBaseline />
+    <div className={classes.paper}>
+      <Typography component="h1" variant="h5">
+        Sign Up
+      </Typography>
+      
+      {error && (
+           <Alert severity="error">{error}</Alert>
+    )}
+      <form className={classes.form} noValidate onSubmit={(e) => signUp(e)}>
+        <TextField
+        onChange={(event) => setEmail(event.target.value)} 
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          id="email"
+          label="Email Address"
+          name="email"
+          autoComplete="email"
+          autoFocus
+        />
+        <TextField
+        onChange={(event) => setPassword(event.target.value)}
+          variant="outlined"
+          margin="normal"
+          required
+          fullWidth
+          name="password"
+          label="Password"
+          type="password"
+          id="password"
+          autoComplete="current-password"
+        />
+       
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          color="primary"
+          className={classes.submit}
+          disabled={loading}
+        >
+          Sign Up
+        </Button>
+        <Grid container>
+          
+          <Grid item>
+            <Link href="#" variant="body2" onClick={()=>props.setCurrentPage(props.currentPage)}>
+              {"have an account? Login"}
+            </Link>
+          </Grid>
+        </Grid>
       </form>
     </div>
+  </Container>
   )
 
 };
 
 export { SignUp };
 ```
-
-so what this does is process the sign up thorough props then if success it will go to login and if it fails it will throw an error.
-
-## Step 2 - Create Login Component
-
-So in order for us to crop an image we should first have file in our storage, to do that we can either upload it to storage through appwrite dashboard, or we can create a login page then upload it and then crop the image using appwrite server. This tutorial will use the second one so you will learn how to login, upload, and crop the image using appwrite sdk. First of all we create the login component.
+example usage
 
 ```js
+<SignUp
+            appwrite={appwrite}
+            currentPage={currentPage}
+            setCurrentPage={(currentPage) => setCurrentPage(!currentPage)}
+          />
+```
+it takes three props which is 
 
+- ```appwrite``` to connect to appwrite server using sdk
+- ```currentPage``` the state of login or sign up
+- ```setCurrentPage``` to switch between login and sign up
+
+so what this does is process the sign up through ```signUp``` function then if success it will go to login component so that we can login using that credential notice that we dont have email verification here because the purpose of the this tutorial is actually to cropping an image and this step is one of the step to implement that functionality.
+
+## Step 3 - Create Login Component
+
+```js
 import React, { useState } from 'react';
+import Button from "@material-ui/core/Button";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import TextField from "@material-ui/core/TextField";
+import Link from "@material-ui/core/Link";
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+import Alert from '@material-ui/lab/Alert';
+import { makeStyles } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    marginTop: theme.spacing(8),
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center"
+  },
+   form: {
+    width: "100%", // Fix IE 11 issue.
+    marginTop: theme.spacing(1)
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2)
+  }
+}));
 
 function Login(props) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  async function processLogin(event) {
-    event.preventDefault()
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
+    async function login(e) {
+      e.preventDefault()
+  
+      if (loading) return;
+  
+      setLoading(true)
+      try {
+        setError(false)
+        await props.appwrite.account.createSession(
+          email,
+          password
+        )
+        props.getUserData()
+      } catch(err) {
+        
+        setError(err.message)
+      }
+       setLoading(false)
+    }
 
-    if (loading) return;
-
-    setLoading(true)
-    await props.loginFunc(email, password);
-
-
-    setLoading(false)
-  }
-
+  const classes = useStyles();
 
   return (
-    <div style={{ display: props.currentPage ? "block" : "none" }}>
-      <h1>Login</h1>
-
-      {props.error().type === "login" && (
-        <p className='error'>{props.error().message}</p>
+    <Container component="main" maxWidth="xs"  style={{ display: props.currentPage ? "block" : "none" }}>
+      <CssBaseline />
+      <div className={classes.paper}>
+        <Typography component="h1" variant="h5">
+          Login
+        </Typography>
+        
+        {error && (
+             <Alert severity="error">{error}</Alert>
       )}
-      <form onSubmit={(e) => processLogin(e)}>
-        <input onChange={(event) => setEmail(event.target.value)} type='email' id='email' required placeholder='Email' />
-        <input onChange={(event) => setPassword(event.target.value)} type='password' id='password' required placeholder='Password' />
-        <button disabled={loading} type='submit'>Sign In</button>
-      </form>
-    </div>
-  )
+        <form className={classes.form} noValidate onSubmit={(e) => login(e)}>
+          <TextField
+          onChange={(event) => setEmail(event.target.value)} 
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            id="email"
+            label="Email Address"
+            name="email"
+            autoComplete="email"
+            autoFocus
+          />
+          <TextField
+          onChange={(event) => setPassword(event.target.value)}
+            variant="outlined"
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
+          />
+         
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+            disabled={loading}
+          >
+            Login
+          </Button>
+          <Grid container>
+            
+            <Grid item>
+              <Link href="#" variant="body2" onClick={()=>props.setCurrentPage(props.currentPage)}>
+                {"Don't have an account? Sign Up"}
+              </Link>
+            </Grid>
+          </Grid>
+        </form>
+      </div>
+    </Container>
+  );
+}
 
-};
+export {Login}
 
-export { Login };
 ```
 
-here we create a functional component that has another function called ```processLogin``` which will process our login through ```props.loginFunc``` if it's success it will go to our main page if it doesn't it will throw an authorized error.
+example usage
 
-## Step 3 - Create UploadImage Component
+```js
+   <Login
+            appwrite={appwrite}
+            currentPage={currentPage}
+            getUserData={getUserData}
+            setCurrentPage={(currentPage) => setCurrentPage(!currentPage)}
+          />
+```
+it takes four props which is 
 
-UploadImage component is used for uploading component through appwrite SDK so after we login in order for us to crop an image we should upload our image so that we can crop it later
+- ```appwrite``` to connect to appwrite server using sdk
+- ```currentPage``` the state of login or sign up
+- ```setCurrentPage``` to switch between login and sign up
+- ```getUserData``` to check we already login or not
+
+here we implement login because in order for us to be able to crop an image we should login to our appwrite server and this component does exactly that.
+
+## Step 4 - Create UploadImage Component
+
+UploadImage component is used for uploading component through appwrite SDK so after we login in order for us to crop an image we should upload our image so that we can crop it later.
 
 ```js
 import React, { useState } from 'react';
-
+import Button from "@material-ui/core/Button";
 function UploadImage(props) {
   const [loading, setLoading] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
@@ -184,8 +426,15 @@ function UploadImage(props) {
       <h1>Upload Image</h1>
       {error && (<p>{error}</p>)}
       <input type="file" onChange={onFileChange} />
-
-      <button disabled={loading} onClick={() => { processUpload(props) }} >Upload</button>
+      <Button
+          
+          variant="contained"
+          color="primary"
+          disabled={loading} onClick={() => { processUpload(props) }}
+        >
+         Upload
+        </Button>
+     
 
     </div>
   )
@@ -195,14 +444,29 @@ function UploadImage(props) {
 export { UploadImage };
 ```
 
-## Step 4 - Create ListImage Component
+example usage
+
+```js
+  <UploadImage appwrite={appwrite} />
+```
+
+this only take one props which is appwrite for connecting to our server using appwrite sdk also if you notice this code
+
+```js
+await props.appwrite.storage.createFile(uploadFile, ['*'], ['*']);
+```
+
+is actually for uploading our file whether its image or but in this tutorial we will use image and this function actually take three parameters you can take a look the detailed explanation here https://appwrite.io/docs/client/storage#createFile
+
+## Step 5 - Create ListImage Component
 
 So after we done uploading our image we want to see all of our image that we upload right? so in order to do that we create a ```ListImage``` component so that we can show our image from the server
 
 ```js
 import React, { useState, useEffect } from 'react';
 import { PreviewImage } from "./PreviewImage"
-
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
 function ListImage(props) {
   const [listImages,setListImages]=useState([])
   const [active, setActive] = useState(null)
@@ -232,18 +496,35 @@ function ListImage(props) {
   return (
     <div>
       <h1>List Image</h1>
-      <button onClick={()=>getAllImages()}>refresh list</button>
-      {listImages?.length && listImages.length > 0 ? listImages.map((a, index) => {
+      
+<Button
+          style={{marginBottom:30}}
+          variant="contained"
+          color="primary"
+          onClick={()=>getAllImages()}
+        >
+      Refresh List
+        </Button>
+  
+      
+        <Grid
+  container
+  direction="row"
+  spacing={5}
+>
+{listImages?.length && listImages.length > 0 ? listImages.map((a, index) => {
         a.color = active === index ? "solid" : "none";
 
         return (
-          <div key={index} style={{ display: "inline-block", border: a.color, cursor: "pointer" }} onClick={(e) => selectImage(e, a.$id, index)}>
+          <Grid container justify="center" xs={4} item key={index} style={{  border: a.color, cursor: "pointer" }} onClick={(e) => selectImage(e, a.$id, index)}>
 
             <PreviewImage width={300} output={"webp"} appwrite={props.appwrite} id={a.$id} />
-          </div>
+          </Grid>
 
         )
       }) : ""}
+</Grid>
+      
     </div>
   )
 
@@ -252,59 +533,111 @@ function ListImage(props) {
 export { ListImage };
 
 ```
-
-There is two important function here which is ```getAllImages``` and ```selectImage``` what is that? so we create ```getAllImages``` so that we can get a list of image that we upload from our server and then we also create ```selectImage``` here so that we can select which of the image that we want to crop for later.
-
-## Step 5 - Create PreviewImage Component
-
-So this is actually the main ingredient in our tutorial what this does is to show the preview of the image in our server and return in a spesific parameter that we want so in order to use this component we can pass the parameter exactly the same as in the appwrite SDK documentation which is id,width,height,quality,background,and output and it will output the image in that spesific condition which mean this component is used for cropping an image that we get from our storage.
+example usage
 
 ```js
-import React, { useState } from 'react';
-
-function PreviewImage(props) {
-
-  function getImage(id){
-
-    let mWidth=props.width || null;
-    let mHeight=props.height || null;
-    let mQuality=props.quality || 100;
-    let mBackground=props.background || null;
-    let mOutput=props.output || null;
-    let image=props.appwrite.storage.getFilePreview(id,mWidth,mHeight,mQuality,mBackground,mOutput);
-
-
-    return image
-  }
-
-    return (<img src={props.id?getImage(props.id):""} />)
-  
-};
-
-export { PreviewImage };
+<ListImage appwrite={appwrite} changeImage={(id) => changeImage(id)} />
 ```
+
+there is two props here:
+
+- ```appwrite``` for using the appwrite SDK
+- ```changeImage``` to pick or change an image that we want to crop later in ```PreviewAndCrop``` component
 
 ## Step 6 - Create PreviewAndCrop Component
 
-So what this component does is to preview how the image will look like after we crop it which means how if the we change the width to 100 how if we change quality to 20 and etc. This component does all that.
+So what this component does is it takes the imake that we pick from the list images then we change the value of the width, height etc. here. So that we can preview how the image look like after cropping.
 
 ```js
 import React, { useState } from 'react';
 import {PreviewImage} from "./PreviewImage"
+import Grid from "@material-ui/core/Grid";
+import Slider from "@material-ui/core/Slider";
+import Input from "@material-ui/core/Input";
 function PreviewAndCrop(props) {
-  const [width,setWidth]=useState(null)
-  const [height,setHeight]=useState(null)
-  const [quality,setQuality]=useState(null)
+  const [width,setWidth]=useState(0)
+  const [height,setHeight]=useState(0)
+  const [quality,setQuality]=useState(0)
   const [background,setBackground]=useState(null)
   const [output,setOutput]=useState(null)
   
  return (
    <div>
 <h1>Preview and Crop Image</h1>
-width : <input onChange={(e)=>setWidth(e.target.value)} type="range" min="0" max="4000"  /> {width}
-height : <input onChange={(e)=>setHeight(e.target.value)} type="range" min="0" max="4000"  /> {height}
-quality : <input onChange={(e)=>setQuality(e.target.value)} type="range" min="0" max="100"  /> {quality}
-background : <input type="color" onChange={(e)=>setBackground(e.target.value.replace("#",""))}/>
+<Grid  container
+  direction="column"
+  spacing={5}>
+<Grid item>
+width :  <Input
+style={{marginRight:10}}
+          value={width}
+          margin="dense"
+          onChange={(e)=>setWidth(e.target.value===''?'':Number(e.target.value))}
+          onBlur={()=>{
+            if (width < 0) {
+              setWidth(0);
+            } else if (width > 4000) {
+              setWidth(4000);
+            }
+          }}
+          inputProps={{
+            step: 1,
+            min: 0,
+            max: 4000,
+            type: 'number',
+            'aria-labelledby': 'input-slider',
+          }}
+        /> possible values 0 - 4000
+</Grid>
+<Grid item>
+height :  <Input
+style={{marginRight:10}}
+          value={height}
+          margin="dense"
+          onChange={(e)=>setHeight(e.target.value===''?'':Number(e.target.value))}
+          onBlur={()=>{
+            if (height < 0) {
+              setHeight(0);
+            } else if (height > 4000) {
+              setHeight(4000);
+            }
+          }}
+          inputProps={{
+            step: 1,
+            min: 0,
+            max: 4000,
+            type: 'number',
+            'aria-labelledby': 'input-slider',
+          }}
+        /> possible values 0 - 4000
+</Grid>
+<Grid item>
+quality :  <Input
+style={{marginRight:10}}
+          value={quality}
+          margin="dense"
+          onChange={(e)=>setQuality(e.target.value===''?'':Number(e.target.value))}
+          onBlur={()=>{
+            if (quality < 0) {
+              setQuality(0);
+            } else if (quality > 100) {
+              setQuality(100);
+            }
+          }}
+          inputProps={{
+            step: 1,
+            min: 0,
+            max: 100,
+            type: 'number',
+            'aria-labelledby': 'input-slider',
+          }}
+        /> possible values 0 - 100
+</Grid>
+<Grid item>
+background : <input style={{marginRight:10}} type="color" onChange={(e)=>setBackground(e.target.value.replace("#",""))}/>
+ only works for png with transparent background
+</Grid>
+<Grid item >
 output : <select onChange={(e)=>setOutput(e.target.value)}>
   <option value="jpeg">jpeg</option>
   <option value="jpg">jpg</option>
@@ -312,7 +645,12 @@ output : <select onChange={(e)=>setOutput(e.target.value)}>
   <option value="gif">gif</option>
   <option value="webp">webp</option>
 </select>
+</Grid>
+</Grid>
+<Grid item style={{marginTop:15}}>
 <PreviewImage appwrite={props.appwrite} width={width} height={height} quality={quality} background={background} output={output} id={props.imageId} />
+</Grid>
+
    </div>
   
  )
@@ -321,6 +659,16 @@ output : <select onChange={(e)=>setOutput(e.target.value)}>
 
 export { PreviewAndCrop };
 ```
+example usage
+
+```js
+<PreviewAndCrop imageId={imageId} appwrite={appwrite} />
+```
+
+there is two props here:
+
+- ```imageId``` to get the state of imageId that we get from ```ListImages``` component and preview it using ```PreviewImage``` component
+- ```appwrite``` for using the appwrite SDK
 
 ## Step 7 - Putting it all together in App.js
 
@@ -334,11 +682,11 @@ import { ListImage } from './components/ListImage';
 import { UploadImage } from './components/UploadImage';
 import { Login } from './components/Login';
 import { SignUp } from './components/SignUp';
-
+import Button from "@material-ui/core/Button";
+import Container from "@material-ui/core/Container";
 function App() {
-  const [appwrite, setAppwrite] = useState(appWrite({ endpoint: "http://localhost:4000/v1", projectId: "5f6f49028c5b9" }))
+  const [appwrite] = useState(appWrite({ endpoint: "http://localhost:4000/v1", projectId: "5f6f49028c5b9" }))
   const [userProfile, setUserProfile] = useState(false);
-  const [error, setError] = useState(false);
   const [currentPage, setCurrentPage] = useState(true);
   const [imageId, setImageId] = useState(null);
   async function getUserData() {
@@ -349,39 +697,8 @@ function App() {
       console.log(err)
     }
   }
-  async function login(email, password) {
-    try {
-      setError(false)
-      await appwrite.account.createSession(
-        email,
-        password
-      );
-      getUserData();
-    } catch (err) {
-      console.log(err.message)
-      setError({ type: "login", message: err.message })
 
 
-    }
-  }
-  async function signUp(email, password) {
-    try {
-
-
-      setError(false)
-
-
-      await appwrite.account.create(
-        email,
-        password
-      );
-      setCurrentPage(true)
-
-    } catch (err) {
-      setError({ type: "signUp", message: err.message })
-
-    }
-  }
 
   async function logout() {
     await setUserProfile(false);
@@ -392,30 +709,40 @@ function App() {
     getUserData()
   }, []);
 
-  function changeImage(id) {
-    setImageId(id)
-  }
+ 
   return (
     <div>
 
       {!userProfile && (
-        <div className='loginPage'>
-          <Login currentPage={currentPage} loginFunc={(email, password) => login(email, password)} error={() => error} />
-          <SignUp currentPage={currentPage} signUpFunc={(email, password) => signUp(email, password)} error={() => error} />
-          <div className='loginSwitchContainer'>
-            <p>{currentPage ? "Haven't got an account?" : 'Got an account?'}</p>
-            <button onClick={() => setCurrentPage(!currentPage)}>{currentPage ? 'Sign Up' : 'Login'}</button>
-          </div>
+        <div >
+          <Login
+            appwrite={appwrite}
+            currentPage={currentPage}
+            getUserData={getUserData}
+            setCurrentPage={(currentPage) => setCurrentPage(!currentPage)}
+          />
+          <SignUp
+            appwrite={appwrite}
+            currentPage={currentPage}
+            setCurrentPage={(currentPage) => setCurrentPage(!currentPage)}
+          />
+
         </div>
       )}
       {userProfile && (
-        <div>
+        <Container component="main"  >
+        
           <UploadImage appwrite={appwrite} />
-          <ListImage appwrite={appwrite} changeImage={(id) => changeImage(id)} />
+          <ListImage appwrite={appwrite} changeImage={(id) => setImageId(id)} />
           <PreviewAndCrop imageId={imageId} appwrite={appwrite} />
-
-          <button onClick={() => logout()}>LOGOUT</button>
-        </div>
+          <Button 
+           variant="contained"
+           color="primary"
+          onClick={() => logout()}>
+          LOGOUT
+        </Button>
+          
+        </Container>
 
       )}
 
@@ -426,123 +753,24 @@ function App() {
 
 export default App;
 ```
+so here is our final application look like there is 4 state that we use
 
-i will explain one by one what does this component do so first of all we import all of the component that we create earlier 
+- ```appwrite``` state to implement the appwrite SDK that we create in ```utils.js``` earlier
+- ```userProfile``` to check whether we already login or not
+- ```currentPage``` to change between sign up and login
+- ```imageId``` to pick the image that we want to crop in ```ListImages``` component then crop it using ```PreviewAndCrop``` component
 
-```js
-import React, { useState, useEffect } from 'react'; //react hooks for managing state
-import { appWrite } from './utils'; //to connect to our server
-import { ListImage } from './components/ListImage'; // to list all of our image
-import { PreviewAndCrop } from './components/PreviewAndCrop'; //to show the cropped image that we pick from ListImage component
-import { UploadImage } from './components/UploadImage'; // to upload image
-import { Login } from './components/Login'; // login
-import { SignUp } from './components/SignUp'; // sign up
-```
+there is two function
 
-so after that we create our state so that our component can re-render if there is some change in state
+- ```getUserData``` to check whether we already login or not using appwrite SDK
+- ```logout``` to logout of the application
 
-```js
- const [appwrite, setAppwrite] = useState(appWrite({ endpoint: "http://localhost:4000/v1", projectId: "5f6f49028c5b9" })) // this is for connecting to our appwrite server
-  const [userProfile, setUserProfile] = useState(false); //check if we are logegd in or not
-  const [error, setError] = useState(false); // check if there are error or not
-  const [currentPage, setCurrentPage] = useState(true); // change state between sign up and login
-  const [imageId, setImageId] = useState(null); // pick image from ListImage component
-```
-
-so after that we create a function that we use for connecting our app to our backend appwrite server
-
-```js
-async function getUserData() {
-    try {
-      const response = await appwrite.account.get();
-      setUserProfile(response)
-    } catch (err) {
-      console.log(err)
-    }
-  } // check if user already logged in or no 
-  async function login(email, password) {
-    try {
-      setError(false)
-      await appwrite.account.createSession(
-        email,
-        password
-      );
-      getUserData();
-    } catch (err) {
-      console.log(err.message)
-      setError({ type: "login", message: err.message })
-
-
-    }
-  } // login to server
-  async function signUp(email, password) {
-    try {
-
-
-      setError(false)
-
-
-      await appwrite.account.create(
-        email,
-        password
-      );
-      setCurrentPage(true)
-
-    } catch (err) {
-      setError({ type: "signUp", message: err.message })
-
-    }
-  } // sign up to server
-
-  async function logout() {
-    await setUserProfile(false);
-    appwrite.account.deleteSession('current');
-  } // logout from server
-
-  useEffect(() => {
-
-    getUserData()
-  }, []); // from the first time our page load check if user logged in show our main page if no go to login
-
-  function changeImage(id) {
-    setImageId(id)
-  } // change an image in PreviewAndCrop component
-```
-after that we can render our app using this code
-
-```js
-return (
-    <div>
-
-      {!userProfile && (
-        <div className='loginPage'>
-          <Login currentPage={currentPage} loginFunc={(email, password) => login(email, password)} error={() => error} />
-          <SignUp currentPage={currentPage} signUpFunc={(email, password) => signUp(email, password)} error={() => error} />
-          <div className='loginSwitchContainer'>
-            <p>{currentPage ? "Haven't got an account?" : 'Got an account?'}</p>
-            <button onClick={() => setCurrentPage(!currentPage)}>{currentPage ? 'Sign Up' : 'Login'}</button>
-          </div>
-        </div>
-      )}
-      {userProfile && (
-        <div>
-          <UploadImage appwrite={appwrite} />
-          <ListImage appwrite={appwrite} changeImage={(id) => changeImage(id)} />
-          <PreviewAndCrop imageId={imageId} appwrite={appwrite} />
-
-          <button onClick={() => logout()}>LOGOUT</button>
-        </div>
-
-      )}
-
-    </div>
-  )
-```
-so what this does is to check whether or not our user logged in if no go to login if yes go to our main page which is to crop and preview a cropped image
 
 ## What next?
 
 Congratulations! You've just created a image cropping page using React and Appwrite! 🥳🥳🥳
+
+Notice that i use material ui for the design here you can change that if you don't like it, but the most important thing here is you learn how to use the preview and cropping API of appwrite SDK.
 
 Good Luck! If you need any help feel free to join the [Discord](https://discord.gg/ZFwqr3S) or Refer to the [Appwrite Documentation](https://appwrite.io/docs). TIP: [Checkout account create documentation for the web API](https://appwrite.io/docs/client/account#create)
 

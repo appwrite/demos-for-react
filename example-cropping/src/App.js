@@ -32,9 +32,7 @@ function App() {
     getUserData()
   }, []);
 
-  function changeImage(id) {
-    setImageId(id)
-  }
+  
   return (
     <div>
 
@@ -58,7 +56,7 @@ function App() {
         <Container component="main"  >
         
           <UploadImage appwrite={appwrite} />
-          <ListImage appwrite={appwrite} changeImage={(id) => changeImage(id)} />
+          <ListImage appwrite={appwrite} changeImage={(id) => setImageId(id)} />
           <PreviewAndCrop imageId={imageId} appwrite={appwrite} />
           <Button 
            variant="contained"
