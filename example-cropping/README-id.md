@@ -1,31 +1,32 @@
 # Appwrite + ReactJS =❤️
-This example is to showcase [Appwrite's JS API](https://github.com/appwrite/sdk-for-js) with [React](https://reactjs.org/) by creating a Simple image cropping examples and tutorial.
+Ini adalah contoh penggunaan [Appwrite's JS API](https://github.com/appwrite/sdk-for-js) dengan [React](https://reactjs.org/) dengan membuat aplikasi cropping sederhana.
 
-Click here for [Indonesian Version](/README-id.md)
+Klik disini untuk [Versi Inggris](/README.md)
 
-## Prerequisites
+## Prasyarat
 
--   A Recent Version of NodeJS
--   Yarn (Feel free to use NPM if you want to, just switch out the Yarn Commands for their NPM counterparts)
--   [A locally running appwrite instance](https://appwrite.io/docs/installation).
+-   Versi terbaru dan stabil NodeJS
+-   Yarn (silahkan jika mau menggunakan NPM)
+-   [Server appwrite yang berjalan di localhost](https://appwrite.io/docs/installation).
+
 ## Getting Started
-To get started quickly we will use [Create React App](https://github.com/facebook/create-react-app) to create the boilerplate that our code will be built on.
+Untuk memulai dengan cepat kita akan menggunakan [Create React App](https://github.com/facebook/create-react-app) untuk membuat __boilerplate__ dimana aplikasi kita akan dibuat.
 ```shell
 npx create-react-app appwrite-react
 cd appwrite-react
 ```
-While we are in the CLI we will also install the Appwrite JS API by running:
+kita juga harus menginstall library appwrite dengan mengetik:
 ```shell
 yarn add appwrite
 ```
-and finally we will launch the React development server with:
+lalu kita jalankan aplikasi kita dengan
 ```shell
 yarn start
 ```
-This should launch a server on `localhost:3000` with Live Reload.
+Ini akan memulai aplikasi kita di `localhost:3000` dengan Reload otomatis.
 
-## Introducing the Appwrite SDK
-With the boilerplate now complete we can now initialise the Appwrite SDK in the project before working on the cropping tutorial. To keep things clean we will initialise this in it's own file, we will create this file in `src/` and call it `utils.js`. Within this file go ahead and paste the following code:
+## Pengenalan Appwrite SDK
+Setelah __boilerplate__ sudah selesai dibuat sekarang kita bisa menginisialisai Appwrite SDK di proyek kita sebelum membuat tutorial cropping. Untuk menyederhanakan aplikasi kita akan membuat satu file untuk dipakai seterusnya, kita akan membuat file di direktori `src/` dan menamakannya `utils.js`. di dalam file ini copy paste kode berikut:
 ```js
 import 'appwrite';
 const appwrite = new window.Appwrite();
@@ -41,10 +42,9 @@ export { appWrite };
 
 ```
 
+## Bagaimana Cara Membuat Cropping Image Dengan Appwrite SDK
 
-## How To Use Cropping Using Appwrite SDK
-
-To crop an image using appwrite SDK is actually pretty simple you just need to upload your file into appwrite storage then preview the image and pass the optional parameters, if you take a look at the js docs in https://appwrite.io/docs/client/storage#getFilePreview you will see all of the optional parameters and how to use it. Below is the example of how to use it using js SDK
+Untuk membuat cropping gambar pertama tama kita harus login setelah login kita upload gambar kita lalu kita crop gambar tersebut menggunakan appwrite SDK seperti berikut:
 
 ```js
 let sdk = new Appwrite();
@@ -60,11 +60,11 @@ console.log(result); // Resource URL for example http://localhost/v1/storage/fil
 
 ```
 
-using the above script we will get our image with the output that we like so for example we pass 300 as width,100 as quality and output webp we will get exactly the output like that without the need of cdn to change the width, height, quality ,background, and output the appwrite will do it just like we want. Now we will create a component that can implement this functionality using react, below is step by step how to create simple app that can crop our image from appwrite storage starting from signup, login, upload, list, then preview and crop.
+dengan menggunakan kode diatas kita akan mendapatkan hasil cropping image kita berupa URL yang nantinya bisa kita pakai dengan memasangnya di tag <img/> sebagai contoh.
 
-## Step 1 - Create PreviewImage Component
+## Langkah 1 - Buat Komponen PreviewImage 
 
-So this is actually the main ingredient in our tutorial what this does is to show the preview of the image in our server and return in a spesific parameter that we want so in order to use this component we can pass the parameter exactly the same as in the appwrite SDK documentation which is id,width,height,quality,background,and output and it will output the image with that spesific condition which mean this component is used for cropping an image that we get from our storage.
+Ini adalah komponen yang digunakan untuk memperlihatkan hasil dari cropping image kita
 
 ```js
 import React, { useState } from 'react';
@@ -91,17 +91,17 @@ function PreviewImage(props) {
 export { PreviewImage };
 ```
 
-example usage
+contoh penggunaan
 
 ```js
 <PreviewImage appwrite={props.appwrite} width={width} height={height} quality={quality} background={background} output={output} id={props.imageId} />
 ```
 
-as you can see there is so many props there to use it actually the same as in the SDK but instead we implement it in react the different maybe there is ```appwrite``` props which is used for interacting with appwrite SDK
+disini bisa anda lihat ada banyak props yang bisa digunakan semua props ini adalah paramater yang bisa anda lihat dokumentasinya di dokumentasi resmi appwrite SDK https://appwrite.io/docs/client/storage#getFilePreview perbedaannya mungkin tidak ada parameter ```appwrite``` di dokumentasi appwrite SDK karena props ```appwrite``` disini digunakan untuk implementasi appwrite SDK itu sendiri
 
-## Step 2 - Create SignUp Component
+## Langkah 2 - Buat Komponen SignUp
 
-This component is used for sign up to our appwrite server using appwrite SDK in order to login you should sign up first to appwrite SDK.
+Komponen berikut digunakan untuk Sign up kedalam server appwrite menggunakan appwrite SDK
 
 ```js
 
@@ -236,7 +236,7 @@ function SignUp(props) {
 
 export { SignUp };
 ```
-example usage
+contoh pemakaian
 
 ```js
 <SignUp
@@ -245,15 +245,13 @@ example usage
             setCurrentPage={(currentPage) => setCurrentPage(!currentPage)}
           />
 ```
-it takes three props which is 
+komponen berikut mengambil tiga props:
 
-- ```appwrite``` to connect to appwrite server using sdk
-- ```currentPage``` the state of login or sign up
-- ```setCurrentPage``` to switch between login and sign up
+- ```appwrite``` untuk konek menggunakan sdk
+- ```currentPage``` untuk menyimpan state login atau sign up
+- ```setCurrentPage``` untuk mengganti state dari login ke sign up dan sebaliknya
 
-so what this does is process the sign up through ```signUp``` function then if success it will go to login component so that we can login using that credential notice that we dont have email verification here because the purpose of the this tutorial is actually to cropping an image and this step is one of the step to implement that functionality.
-
-## Step 3 - Create Login Component
+## Langkah 3 - Membuat Komponen Login
 
 ```js
 import React, { useState } from 'react';
@@ -375,7 +373,7 @@ export {Login}
 
 ```
 
-example usage
+contoh penggunaan
 
 ```js
    <Login
@@ -385,18 +383,16 @@ example usage
             setCurrentPage={(currentPage) => setCurrentPage(!currentPage)}
           />
 ```
-it takes four props which is 
+komponen berikut mengambil 4 props yaitu:
 
-- ```appwrite``` to connect to appwrite server using sdk
-- ```currentPage``` the state of login or sign up
-- ```setCurrentPage``` to switch between login and sign up
-- ```getUserData``` to check we already login or not
+- ```appwrite``` untuk konek ke server appwrite
+- ```currentPage``` untuk menyimpan state login atau sign up
+- ```setCurrentPage``` mengganti state ke login atau sign up
+- ```getUserData``` mengecek apakah kita sudah login atau tidak 
 
-here we implement login because in order for us to be able to crop an image we should login to our appwrite server and this component does exactly that.
+## Langkah 4 - Membuat Komponen UploadImage 
 
-## Step 4 - Create UploadImage Component
-
-UploadImage component is used for uploading component through appwrite SDK so after we login in order for us to crop an image we should upload our image so that we can crop it later.
+Komponen UploadImage untuk mengupload file ke appwrite server menggunakan appwrite SDK
 
 ```js
 import React, { useState } from 'react';
@@ -446,23 +442,23 @@ function UploadImage(props) {
 export { UploadImage };
 ```
 
-example usage
+contoh penggunaan
 
 ```js
   <UploadImage appwrite={appwrite} />
 ```
 
-this only take one props which is appwrite for connecting to our server using appwrite sdk also if you notice this code
+komponen ini hanya butuh satu props yaitu ```appwrite``` untuk memanggil method ```createFile```
 
 ```js
 await props.appwrite.storage.createFile(uploadFile, ['*'], ['*']);
 ```
 
-is actually for uploading our file whether its image or but in this tutorial we will use image and this function actually take three parameters you can take a look the detailed explanation here https://appwrite.io/docs/client/storage#createFile
+method berikut digunakan untuk mengupload file ke server untuk melihat lebih jelas bagaimana cara menggunakannya anda bisa melihat dokumentasinya disini https://appwrite.io/docs/client/storage#createFile
 
-## Step 5 - Create ListImage Component
+## Langkah 5 - Membuat Komponen ListImage
 
-So after we done uploading our image we want to see all of our image that we upload right? so in order to do that we create a ```ListImage``` component so that we can show our image from the server
+setelah kita berhasil mengupload image kita membuat komponen ```ListImage``` untuk melihat semua list file kita dan juga komponen ini digunakan untuk memilih file mana yang akan kita crop nantinya.
 
 ```js
 import React, { useState, useEffect } from 'react';
@@ -535,20 +531,20 @@ function ListImage(props) {
 export { ListImage };
 
 ```
-example usage
+contoh pemakaian
 
 ```js
 <ListImage appwrite={appwrite} changeImage={(id) => changeImage(id)} />
 ```
 
-there is two props here:
+ada dua props disini:
 
-- ```appwrite``` for using the appwrite SDK
-- ```changeImage``` to pick or change an image that we want to crop later in ```PreviewAndCrop``` component
+- ```appwrite``` untuk konek ke server melalui SDK
+- ```changeImage``` untuk memilih atau mengubah image yang akan kita crop
 
-## Step 6 - Create PreviewAndCrop Component
+## Step 6 - Membuat Komponen PreviewAndCrop
 
-So what this component does is it takes the imake that we pick from the list images then we change the value of the width, height etc. here. So that we can preview how the image look like after cropping.
+Komponen berikut digunakan untuk memperlihatkan hasil dari cropping yang sudah kita lakukan. Jadi setelah kita memilih gambar di komponen berikut anda akan mendapatkan opsi untuk mengubah salah satu parameter dari cropping image yang berasal dari appwrite SDK seperti width, height, dan lain sebagainya.
 
 ```js
 import React, { useState } from 'react';
@@ -661,20 +657,20 @@ output : <select onChange={(e)=>setOutput(e.target.value)}>
 
 export { PreviewAndCrop };
 ```
-example usage
+contoh penggunaan
 
 ```js
 <PreviewAndCrop imageId={imageId} appwrite={appwrite} />
 ```
 
-there is two props here:
+ada dua props disini:
 
-- ```imageId``` to get the state of imageId that we get from ```ListImages``` component and preview it using ```PreviewImage``` component
-- ```appwrite``` for using the appwrite SDK
+- ```imageId``` untuk mendapatkan imageId dari komponen ```ListImages``` dan memperlihatkan  hasil dari cropping kita di komponen ```PreviewImage```
+- ```appwrite``` untuk konek ke server appwrite
 
-## Step 7 - Putting it all together in App.js
+## Langkah 7 - Mengkombinasikan semua komponen dalam app.js
 
-So in order for this application to work we should put all of our component into ```App.js``` so that we can see how our cropped image looks like
+Agar aplikasi kita berjalan dengan lancar kita harus mengkombinasikannya dalam satu file yaitu ```App.js``` dengan begitu kita bisa menggunakan aplikasi kita sesuai yang kita mau.
 
 ```js
 import React, { useState, useEffect } from 'react';
@@ -755,25 +751,27 @@ function App() {
 
 export default App;
 ```
-so here is our final application look like there is 4 state that we use
+jadi kode diatas adalah aplikasi final kita ada kode yang harus dijelaskan contohnya adalah sebagai berikut
 
-- ```appwrite``` state to implement the appwrite SDK that we create in ```utils.js``` earlier
-- ```userProfile``` to check whether we already login or not
-- ```currentPage``` to change between sign up and login
-- ```imageId``` to pick the image that we want to crop in ```ListImages``` component then crop it using ```PreviewAndCrop``` component
+di dalam kode diatas ada 4 state:
 
-there is two function
+- ```appwrite``` untuk mengkoneksikan aplikasi React kita ke server appwrite kita membuat file ```utils.js``` sebelumnya, hal itu digunakan untuk memanggil fungsi yang ada di server menggunakan SDK
+- ```userProfile``` state untuk menyimpan apakah kita sudah login atau tidak
+- ```currentPage``` untuk mengganti state dari login ke sign up dan sebaliknya
+- ```imageId``` untuk memilih file gambar yang ingin kita crop dari komponen ```ListImages``` lalu mengcropnya menggunakan komponen ```PreviewAndCrop``` 
 
-- ```getUserData``` to check whether we already login or not using appwrite SDK
-- ```logout``` to logout of the application
+ada dua fungsi dalam ```App.js```
+
+- ```getUserData``` untuk mengecek apakah kita sudah login
+- ```logout``` untuk keluar dan kembali ke login
 
 
-## What next?
+## Apa Selanjutnya?
 
-Congratulations! You've just created a image cropping page using React and Appwrite! 🥳🥳🥳
+Selamat! Anda sudah berhasil membuat aplikasi cropping sederhana! 🥳🥳🥳
 
-Notice that i use material ui for the design here you can change that if you don't like it, but the most important thing here is you learn how to use the preview and cropping API of appwrite SDK.
+Jika anda lihat aplikasi cropping ini digunakan hampir sama seperti saat kita menggunakan CDN jadi kita bisa memperbesar memperkecil image kita dan juga mengubahnya ke format lain seperti webp.
 
-Good Luck! If you need any help feel free to join the [Discord](https://discord.gg/ZFwqr3S) or Refer to the [Appwrite Documentation](https://appwrite.io/docs). TIP: TIP: [Preview Image API](https://appwrite.io/docs/client/storage?sdk=web#getFilePreview)
+Semoga beruntung! Jika ada pertanyaan silahkan bergabung ke [Discord](https://discord.gg/ZFwqr3S) atau lihat [Appwrite Documentation](https://appwrite.io/docs). TIP: [Preview Image API](https://appwrite.io/docs/client/storage?sdk=web#getFilePreview)
 
-(If you want to checkout the finished code is over on the [repository](https://github.com/appwrite/demos-for-react/tree/master/example-cropping) aswell as a mirror for this tutorial!)
+(jika anda ingin mencheckout kode ini silahkan ke [repository](https://github.com/appwrite/demos-for-react/tree/master/example-cropping)!)
