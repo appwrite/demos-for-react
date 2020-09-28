@@ -1,20 +1,92 @@
 import React, { useState } from 'react';
 import {PreviewImage} from "./PreviewImage"
 import Grid from "@material-ui/core/Grid";
+import Slider from "@material-ui/core/Slider";
+import Input from "@material-ui/core/Input";
 function PreviewAndCrop(props) {
-  const [width,setWidth]=useState(null)
-  const [height,setHeight]=useState(null)
-  const [quality,setQuality]=useState(null)
+  const [width,setWidth]=useState(0)
+  const [height,setHeight]=useState(0)
+  const [quality,setQuality]=useState(0)
   const [background,setBackground]=useState(null)
   const [output,setOutput]=useState(null)
   
  return (
    <div>
 <h1>Preview and Crop Image</h1>
-width : <input onChange={(e)=>setWidth(e.target.value)} type="range" min="0" max="4000"  /> {width}
-height : <input onChange={(e)=>setHeight(e.target.value)} type="range" min="0" max="4000"  /> {height}
-quality : <input onChange={(e)=>setQuality(e.target.value)} type="range" min="0" max="100"  /> {quality}
-background : <input type="color" onChange={(e)=>setBackground(e.target.value.replace("#",""))}/>
+<Grid  container
+  direction="column"
+  spacing={5}>
+<Grid item>
+width :  <Input
+style={{marginRight:10}}
+          value={width}
+          margin="dense"
+          onChange={(e)=>setWidth(e.target.value===''?'':Number(e.target.value))}
+          onBlur={()=>{
+            if (width < 0) {
+              setWidth(0);
+            } else if (width > 4000) {
+              setWidth(4000);
+            }
+          }}
+          inputProps={{
+            step: 1,
+            min: 0,
+            max: 4000,
+            type: 'number',
+            'aria-labelledby': 'input-slider',
+          }}
+        /> possible values 0 - 4000
+</Grid>
+<Grid item>
+height :  <Input
+style={{marginRight:10}}
+          value={height}
+          margin="dense"
+          onChange={(e)=>setHeight(e.target.value===''?'':Number(e.target.value))}
+          onBlur={()=>{
+            if (height < 0) {
+              setHeight(0);
+            } else if (height > 4000) {
+              setHeight(4000);
+            }
+          }}
+          inputProps={{
+            step: 1,
+            min: 0,
+            max: 4000,
+            type: 'number',
+            'aria-labelledby': 'input-slider',
+          }}
+        /> possible values 0 - 4000
+</Grid>
+<Grid item>
+quality :  <Input
+style={{marginRight:10}}
+          value={quality}
+          margin="dense"
+          onChange={(e)=>setQuality(e.target.value===''?'':Number(e.target.value))}
+          onBlur={()=>{
+            if (quality < 0) {
+              setQuality(0);
+            } else if (quality > 100) {
+              setQuality(100);
+            }
+          }}
+          inputProps={{
+            step: 1,
+            min: 0,
+            max: 100,
+            type: 'number',
+            'aria-labelledby': 'input-slider',
+          }}
+        /> possible values 0 - 100
+</Grid>
+<Grid item>
+background : <input style={{marginRight:10}} type="color" onChange={(e)=>setBackground(e.target.value.replace("#",""))}/>
+ only works for png with transparent background
+</Grid>
+<Grid item >
 output : <select onChange={(e)=>setOutput(e.target.value)}>
   <option value="jpeg">jpeg</option>
   <option value="jpg">jpg</option>
@@ -22,7 +94,12 @@ output : <select onChange={(e)=>setOutput(e.target.value)}>
   <option value="gif">gif</option>
   <option value="webp">webp</option>
 </select>
+</Grid>
+</Grid>
+<Grid item style={{marginTop:15}}>
 <PreviewImage appwrite={props.appwrite} width={width} height={height} quality={quality} background={background} output={output} id={props.imageId} />
+</Grid>
+
    </div>
   
  )
