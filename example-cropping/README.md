@@ -1,7 +1,7 @@
 # Appwrite + ReactJS =❤️
 This example is to showcase [Appwrite's JS API](https://github.com/appwrite/sdk-for-js) with [React](https://reactjs.org/) by creating a Simple image cropping examples and tutorial.
 
-Click here for [Indonesian Version](/README-id.md)
+Click here for [Indonesian Version](/example-cropping/README-id.md)
 
 ## Prerequisites
 
