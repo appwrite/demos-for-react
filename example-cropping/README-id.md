@@ -1,7 +1,7 @@
 # Appwrite + ReactJS =❤️
 Ini adalah contoh penggunaan [Appwrite's JS API](https://github.com/appwrite/sdk-for-js) dengan [React](https://reactjs.org/) dengan membuat aplikasi cropping sederhana.
 
-Klik disini untuk [Versi Inggris](/README.md)
+Klik disini untuk [Versi Inggris](/example-cropping/README.md)
 
 ## Prasyarat
 
