@@ -31,7 +31,7 @@ npm start
 
 This should launch a server on `localhost:3000` with Live Reload.
 
-## Introducing the Appwrite SDK
+## Introducing the Appwrite Node-SDK
 
 With the boilerplate now complete we can now initialise the Appwrite Node SDK in the project before working on the details page. To keep things clean we will initialise this in it's own file, we will create a folder in `src/` and call it `config` and within this folder we will create the file `index.js`. Within this file go ahead and paste the following code:
 
