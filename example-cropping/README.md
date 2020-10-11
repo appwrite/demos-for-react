@@ -396,7 +396,7 @@ Here we implement login because in order for us to be able to crop an image we s
 
 ## Step 4 - Create UploadImage Component
 
-UploadImage component is used for uploading component through appwrite SDK so after we login in order for us to crop an image we should upload our image so that we can crop it later.
+UploadImage component is used for uploading an image using the Appwrite SDK. Uploading an image will allow us to crop it later. 
 
 ```js
 import React, { useState } from 'react';
