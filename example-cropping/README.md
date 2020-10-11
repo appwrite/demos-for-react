@@ -446,7 +446,7 @@ function UploadImage(props) {
 export { UploadImage };
 ```
 
-example usage
+### Example usage
 
 ```js
   <UploadImage appwrite={appwrite} />
