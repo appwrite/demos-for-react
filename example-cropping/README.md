@@ -91,7 +91,7 @@ function PreviewImage(props) {
 export { PreviewImage };
 ```
 
-example usage
+### Example usage
 
 ```js
 <PreviewImage appwrite={props.appwrite} width={width} height={height} quality={quality} background={background} output={output} id={props.imageId} />
