@@ -236,7 +236,7 @@ function SignUp(props) {
 
 export { SignUp };
 ```
-example usage
+### Example usage
 
 ```js
 <SignUp
