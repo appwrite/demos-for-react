@@ -251,7 +251,7 @@ it takes three props which is
 - ```currentPage``` the state of login or sign up
 - ```setCurrentPage``` to switch between login and sign up
 
-so what this does is process the sign up through ```signUp``` function then if success it will go to login component so that we can login using that credential notice that we dont have email verification here because the purpose of the this tutorial is actually to cropping an image and this step is one of the step to implement that functionality.
+So what this does is process the sign up through ```signUp``` function then if success it will go to login component so that we can login using that credential notice that we dont have email verification here because the purpose of the this tutorial is actually to cropping an image and this step is one of the step to implement that functionality.
 
 ## Step 3 - Create Login Component
 
