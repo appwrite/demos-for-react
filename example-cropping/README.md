@@ -674,7 +674,7 @@ There is two props here:
 
 ## Step 7 - Putting it all together in App.js
 
-So in order for this application to work we should put all of our component into ```App.js``` so that we can see how our cropped image looks like
+So in order for this application to work we should put all of our components into ```App.js``` so that we can see how our cropped image looks
 
 ```js
 import React, { useState, useEffect } from 'react';
