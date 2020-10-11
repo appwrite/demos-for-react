@@ -245,7 +245,7 @@ export { SignUp };
             setCurrentPage={(currentPage) => setCurrentPage(!currentPage)}
           />
 ```
-it takes three props which is 
+It takes three props which is 
 
 - ```appwrite``` to connect to appwrite server using sdk
 - ```currentPage``` the state of login or sign up
