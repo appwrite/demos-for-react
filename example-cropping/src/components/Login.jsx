@@ -1,71 +1,69 @@
 import React, { useState } from 'react';
-import Button from "@material-ui/core/Button";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import TextField from "@material-ui/core/TextField";
-import Link from "@material-ui/core/Link";
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
+import Button from '@material-ui/core/Button';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import TextField from '@material-ui/core/TextField';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
 import Alert from '@material-ui/lab/Alert';
-import { makeStyles } from "@material-ui/core/styles";
-import Container from "@material-ui/core/Container";
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center"
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
   },
-   form: {
-    width: "100%", // Fix IE 11 issue.
-    marginTop: theme.spacing(1)
+  form: {
+    width: '100%', // Fix IE 11 issue.
+    marginTop: theme.spacing(1),
   },
   submit: {
-    margin: theme.spacing(3, 0, 2)
-  }
+    margin: theme.spacing(3, 0, 2),
+  },
 }));
 
-function Login(props) {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
-    async function login(e) {
-      e.preventDefault()
-  
-      if (loading) return;
-  
-      setLoading(true)
-      try {
-        setError(false)
-        await props.appwrite.account.createSession(
-          email,
-          password
-        )
-        props.getUserData()
-      } catch(err) {
-        
-        setError(err.message)
-      }
-       setLoading(false)
+export default function Login(props) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  async function login(e) {
+    e.preventDefault();
+
+    if (loading) return;
+
+    setLoading(true);
+    try {
+      setError(false);
+      await props.appwrite.account.createSession(email, password);
+      props.getUserData();
+    } catch (err) {
+      setError(err.message);
     }
+    setLoading(false);
+  }
 
   const classes = useStyles();
 
   return (
-    <Container component="main" maxWidth="xs"  style={{ display: props.currentPage ? "block" : "none" }}>
+    <Container
+      component="main"
+      maxWidth="xs"
+      // eslint-disable-next-line react/destructuring-assignment
+      style={{ display: props.currentPage ? 'block' : 'none' }}
+    >
       <CssBaseline />
       <div className={classes.paper}>
         <Typography component="h1" variant="h5">
           Login
         </Typography>
-        
-        {error && (
-             <Alert severity="error">{error}</Alert>
-      )}
+
+        {error && <Alert severity="error">{error}</Alert>}
         <form className={classes.form} noValidate onSubmit={(e) => login(e)}>
           <TextField
-          onChange={(event) => setEmail(event.target.value)} 
+            onChange={(event) => setEmail(event.target.value)}
             variant="outlined"
             margin="normal"
             required
@@ -77,7 +75,7 @@ function Login(props) {
             autoFocus
           />
           <TextField
-          onChange={(event) => setPassword(event.target.value)}
+            onChange={(event) => setPassword(event.target.value)}
             variant="outlined"
             margin="normal"
             required
@@ -88,7 +86,7 @@ function Login(props) {
             id="password"
             autoComplete="current-password"
           />
-         
+
           <Button
             type="submit"
             fullWidth
@@ -100,11 +98,10 @@ function Login(props) {
             Login
           </Button>
           <Grid container>
-            
             <Grid item>
-              <Link href="#" variant="body2" onClick={()=>props.setCurrentPage(props.currentPage)}>
-                {"Don't have an account? Sign Up"}
-              </Link>
+              <Button variant="body2" onClick={() => props.setCurrentPage(props.currentPage)}>
+                Don&apos;t have an account? Sign Up
+              </Button>
             </Grid>
           </Grid>
         </form>
@@ -112,5 +109,3 @@ function Login(props) {
     </Container>
   );
 }
-
-export {Login}
