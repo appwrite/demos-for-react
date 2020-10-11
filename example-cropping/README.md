@@ -667,7 +667,7 @@ export { PreviewAndCrop };
 <PreviewAndCrop imageId={imageId} appwrite={appwrite} />
 ```
 
-there is two props here:
+There is two props here:
 
 - ```imageId``` to get the state of imageId that we get from ```ListImages``` component and preview it using ```PreviewImage``` component
 - ```appwrite``` for using the appwrite SDK
