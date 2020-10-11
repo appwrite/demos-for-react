@@ -17,10 +17,10 @@ npx create-react-app appwrite-react
 cd appwrite-react
 ```
 
-While we are in the CLI we will also install the Appwrite Node SDK by running:
+While we are in the CLI we will also install Appwrite by running:
 
 ```shell
-npm install node-appwrite
+npm install appwrite
 ```
 
 and finally we will launch the React development server with:
@@ -31,31 +31,27 @@ npm start
 
 This should launch a server on `localhost:3000` with Live Reload.
 
-## Introducing the Appwrite SDK
+## Introducing the Appwrite
 
-With the boilerplate now complete we can now initialise the Appwrite Node SDK in the project before working on the details page. To keep things clean we will initialise this in it's own file, we will create a folder in `src/` and call it `config` and within this folder we will create the file `index.js`. Within this file go ahead and paste the following code:
+With the boilerplate now complete, we can now initialise Appwrite in the project before working on the details page. To keep things clean we will initialise this in it's own file, we will create a folder in `src/` and call it `config` and within this folder we will create the file `index.js`. Within this file go ahead and paste the following code:
 
 ```js
-const sdk = require("node-appwrite"); //Import appwrite node sdk
+const Appwrite = require("appwrite"); //Import appwrite
 
-// Init SDK
-let client = new sdk.Client();
-
-let locale = new sdk.Locale(client);
-
-client
+let sdk = new Appwrite();
+sdk
   .setEndpoint("http://localhost:443/v1") // Your API Endpoint
   .setProject("[PROJECT ID]") // Your project ID
-  .setKey("[YOUR API SECRET KEY]"); // Your secret API key
+  .setKey("[SECRET API KEY]"); // Your secret API key
 
-let response = locale.get();
+let response = sdk.locale.get();
 
-export {response}; //Exporting response
+export {response};
 ```
 
 A deeper inspection of this code can be found in the comments within it,
 
-TL:DR: Create a appwrite SDK Instance and initalise it with the endpoint and ProjectID of the project we are working with then export this for usage outside of the file.
+TL:DR: Create a appwrite instance and initalise it with the endpoint and ProjectID of the project we are working with then export this for usage outside of the file.
 
 ## Creating App.js
 

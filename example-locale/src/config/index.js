@@ -1,15 +1,11 @@
-const sdk = require("node-appwrite"); //Import appwrite node sdk
+const Appwrite = require("appwrite"); //Import appwrite 
 
-// Init SDK
-let client = new sdk.Client();
-
-let locale = new sdk.Locale(client);
-
-client
+let sdk  = new Appwrite();
+sdk
   .setEndpoint("http://localhost:443/v1") // Your API Endpoint
   .setProject("[PROJECT ID]") // Your project ID
   .setKey("[SECRET API KEY]"); // Your secret API key
 
-let response = locale.get();
+let response = sdk.locale.get();
 
 export {response};
