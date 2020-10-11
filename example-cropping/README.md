@@ -392,7 +392,7 @@ It takes four props which is
 - ```setCurrentPage``` to switch between login and sign up
 - ```getUserData``` to check we already login or not
 
-here we implement login because in order for us to be able to crop an image we should login to our appwrite server and this component does exactly that.
+Here we implement login because in order for us to be able to crop an image we should login to our appwrite server and this component does exactly that.
 
 ## Step 4 - Create UploadImage Component
 
