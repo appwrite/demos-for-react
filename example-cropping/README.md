@@ -375,7 +375,7 @@ export {Login}
 
 ```
 
-example usage
+### Example usage
 
 ```js
    <Login
