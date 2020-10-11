@@ -458,7 +458,7 @@ This only take one props which is Appwrite for connecting to our server using Ap
 await props.appwrite.storage.createFile(uploadFile, ['*'], ['*']);
 ```
 
-is actually for uploading our file whether its image or but in this tutorial we will use image and this function actually take three parameters you can take a look the detailed explanation here https://appwrite.io/docs/client/storage#createFile
+This is actually for creating any file but in this tutorial we will use it to create an image file and this function takea three parameters. You can take a look the detailed explanation here https://appwrite.io/docs/client/storage#createFile
 
 ## Step 5 - Create ListImage Component
 
