@@ -755,7 +755,7 @@ function App() {
 
 export default App;
 ```
-so here is our final application look like there is 4 state that we use
+So here's what our final application looks like. There are 4 state variables that we use
 
 - ```appwrite``` state to implement the appwrite SDK that we create in ```utils.js``` earlier
 - ```userProfile``` to check whether we already login or not
