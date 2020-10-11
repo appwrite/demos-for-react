@@ -541,7 +541,7 @@ export { ListImage };
 <ListImage appwrite={appwrite} changeImage={(id) => changeImage(id)} />
 ```
 
-there is two props here:
+There is two props here:
 
 - ```appwrite``` for using the appwrite SDK
 - ```changeImage``` to pick or change an image that we want to crop later in ```PreviewAndCrop``` component
