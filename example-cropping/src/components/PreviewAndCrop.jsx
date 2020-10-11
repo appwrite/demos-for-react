@@ -15,7 +15,7 @@ export default function PreviewAndCrop({ appwrite, imageId }) {
       <h1>Preview and Crop Image</h1>
       <Grid container direction="column" spacing={5}>
         <Grid item>
-          width :{' '}
+          {'width : '}
           <Input
             style={{ marginRight: 10 }}
             value={width}
@@ -35,11 +35,11 @@ export default function PreviewAndCrop({ appwrite, imageId }) {
               type: 'number',
               'aria-labelledby': 'input-slider',
             }}
-          />{' '}
-          possible values 0 - 4000
+          />
+          {'possible values 0 - 4000 '}
         </Grid>
         <Grid item>
-          height :{' '}
+          {'height : '}
           <Input
             style={{ marginRight: 10 }}
             value={height}
@@ -59,11 +59,11 @@ export default function PreviewAndCrop({ appwrite, imageId }) {
               type: 'number',
               'aria-labelledby': 'input-slider',
             }}
-          />{' '}
-          possible values 0 - 4000
+          />
+          {'possible values 0 - 4000 '}
         </Grid>
         <Grid item>
-          quality :{' '}
+          {'quality : '}
           <Input
             style={{ marginRight: 10 }}
             value={quality}
@@ -83,8 +83,8 @@ export default function PreviewAndCrop({ appwrite, imageId }) {
               type: 'number',
               'aria-labelledby': 'input-slider',
             }}
-          />{' '}
-          possible values 0 - 100
+          />
+          {'possible values 0 - 100 '}
         </Grid>
         <Grid item>
           {'background : '}
