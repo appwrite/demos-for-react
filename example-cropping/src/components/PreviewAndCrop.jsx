@@ -87,7 +87,7 @@ export default function PreviewAndCrop({ appwrite, imageId }) {
           possible values 0 - 100
         </Grid>
         <Grid item>
-          background :{' '}
+          {'background : '}
           <input
             style={{ marginRight: 10 }}
             type="color"
@@ -96,7 +96,7 @@ export default function PreviewAndCrop({ appwrite, imageId }) {
           only works for png with transparent background
         </Grid>
         <Grid item>
-          output :{' '}
+          {'output : '}
           <select onChange={(e) => setOutput(e.target.value)}>
             <option value="jpeg">jpeg</option>
             <option value="jpg">jpg</option>
