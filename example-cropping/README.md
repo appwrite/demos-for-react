@@ -762,7 +762,7 @@ So here's what our final application looks like. There are 4 state variables tha
 - ```currentPage``` to change between sign up and login
 - ```imageId``` to pick the image that we want to crop in ```ListImages``` component then crop it using ```PreviewAndCrop``` component
 
-there is two function
+There are two functions
 
 - ```getUserData``` to check whether we already login or not using appwrite SDK
 - ```logout``` to logout of the application
