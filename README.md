@@ -10,3 +10,4 @@ This repository has various example projects created by the Appwrite community u
 ## Large Projects
 
 None yet! Go ahead and create some!
+Thanks!
