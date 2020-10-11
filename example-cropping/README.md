@@ -452,7 +452,7 @@ export { UploadImage };
   <UploadImage appwrite={appwrite} />
 ```
 
-this only take one props which is appwrite for connecting to our server using appwrite sdk also if you notice this code
+This only take one props which is Appwrite for connecting to our server using Appwrite sdk
 
 ```js
 await props.appwrite.storage.createFile(uploadFile, ['*'], ['*']);
