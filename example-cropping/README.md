@@ -535,7 +535,7 @@ function ListImage(props) {
 export { ListImage };
 
 ```
-example usage
+### Example usage
 
 ```js
 <ListImage appwrite={appwrite} changeImage={(id) => changeImage(id)} />
