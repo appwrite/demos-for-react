@@ -97,7 +97,7 @@ export { PreviewImage };
 <PreviewImage appwrite={props.appwrite} width={width} height={height} quality={quality} background={background} output={output} id={props.imageId} />
 ```
 
-as you can see there is so many props there to use it actually the same as in the SDK but instead we implement it in react the different maybe there is ```appwrite``` props which is used for interacting with appwrite SDK
+The props that you can use in this component are actually the same as in the Appwrite SDK which is id, width, height, quality, background, and output. You can check the function in the docs [here](https://appwrite.io/docs/client/storage#getFilePreview)
 
 ## Step 2 - Create SignUp Component
 
