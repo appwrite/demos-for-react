@@ -462,7 +462,7 @@ This is actually for creating any file but in this tutorial we will use it to cr
 
 ## Step 5 - Create ListImage Component
 
-So after we done uploading our image we want to see all of our image that we upload right? so in order to do that we create a ```ListImage``` component so that we can show our image from the server
+So after we're done uploading our image we would want to see all of our images that we uploaded right? So in order to do that we create a ```ListImage``` component so that we can display our images stored on the server
 
 ```js
 import React, { useState, useEffect } from 'react';
