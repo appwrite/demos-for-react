@@ -60,7 +60,7 @@ console.log(result); // Resource URL for example http://localhost/v1/storage/fil
 
 ```
 
-using the above script we will get our image with the output that we like so for example we pass 300 as width,100 as quality and output webp we will get exactly the output like that without the need of cdn to change the width, height, quality ,background, and output the appwrite will do it just like we want. Now we will create a component that can implement this functionality using react, below is step by step how to create simple app that can crop our image from appwrite storage starting from signup, login, upload, list, then preview and crop.
+using the above script we will get our image with the output that we like so for example we pass 300 as width,100 as quality and output webp we can get the exact output without the need of CDN. Appwrite will do it just like we want. Now we will create a component that can implement this functionality using react, below is the step by step procedure on how to create a simple app that can crop our image from Appwrite storage starting from signup, login, upload, list, then preview and crop.
 
 ## Step 1 - Create PreviewImage Component
 
