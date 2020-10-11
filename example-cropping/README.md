@@ -112,7 +112,7 @@ The props that you can use in this component are actually the same as in the App
 
 ## Step 2 - Create SignUp Component
 
-This component is used for sign up to our appwrite server using appwrite SDK in order to login you should sign up first to appwrite SDK.
+This component is used for sign up to our appwrite server using appwrite SDK in order to login you should sign up first to appwrite server using appwrite SDK.
 
 ```js
 import React, { useState } from 'react';
@@ -244,7 +244,7 @@ It takes three props which is
 - `currentPage` the state of login or sign up
 - `setCurrentPage` to switch between login and sign up
 
-So what this does is process the sign up through `signUp` function then if success it will go to login component so that we can login using that credential notice that we dont have email verification here because the purpose of the this tutorial is actually to cropping an image and this step is one of the step to implement that functionality.
+So what this does is process the sign up through `signUp` function then if success it will go to login component so that we can login using that credential, notice that we dont have email verification here, because the purpose of this tutorial is actually to cropping an image and this step is one of the step to implement that functionality.
 
 ## Step 3 - Create Login Component
 
@@ -435,13 +435,13 @@ export default function UploadImage(props) {
 <UploadImage appwrite={appwrite} />
 ```
 
-This only take one props which is Appwrite for connecting to our server using Appwrite sdk
+This only take one props which is ```appwrite``` for connecting to our server using Appwrite SDK
 
 ```js
 await appwrite.storage.createFile(uploadFile, ['*'], ['*']);
 ```
 
-This is actually for creating any file but in this tutorial we will use it to create an image file and this function takea three parameters. You can take a look the detailed explanation here https://appwrite.io/docs/client/storage#createFile
+This is actually for creating any file but in this tutorial we will use it to create an image file and this function takes three parameters. You can take a look the detailed explanation here https://appwrite.io/docs/client/storage#createFile
 
 ## Step 5 - Create ListImage Component
 
