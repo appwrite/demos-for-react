@@ -772,7 +772,7 @@ There are two functions
 
 Congratulations! You've just created a image cropping page using React and Appwrite! 🥳🥳🥳
 
-Notice that i use material ui for the design here you can change that if you don't like it, but the most important thing here is you learn how to use the preview and cropping API of appwrite SDK.
+Notice that I used material ui for the design here. You can change that if you don't like it, but the most important thing here is you learn how to use the preview and cropping API of Appwrite SDK.
 
 Good Luck! If you need any help feel free to join the [Discord](https://discord.gg/ZFwqr3S) or Refer to the [Appwrite Documentation](https://appwrite.io/docs). TIP: TIP: [Preview Image API](https://appwrite.io/docs/client/storage?sdk=web#getFilePreview)
 
