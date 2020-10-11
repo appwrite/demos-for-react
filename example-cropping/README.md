@@ -449,7 +449,7 @@ export { UploadImage };
 ### Example usage
 
 ```js
-  <UploadImage appwrite={appwrite} />
+<UploadImage appwrite={appwrite} />
 ```
 
 This only take one props which is Appwrite for connecting to our server using Appwrite sdk
