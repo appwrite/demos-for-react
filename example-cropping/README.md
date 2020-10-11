@@ -548,7 +548,7 @@ There is two props here:
 
 ## Step 6 - Create PreviewAndCrop Component
 
-So what this component does is it takes the imake that we pick from the list images then we change the value of the width, height etc. here. So that we can preview how the image look like after cropping.
+So what this component does is it takes the image that we pick from the list of images and allows us to change the value of the width, height etc. here. So that we can preview how the image looks after cropping.
 
 ```js
 import React, { useState } from 'react';
