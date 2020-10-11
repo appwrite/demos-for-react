@@ -64,7 +64,7 @@ using the above script we will get our image with the output that we like so for
 
 ## Step 1 - Create PreviewImage Component
 
-So this is actually the main ingredient in our tutorial what this does is to show the preview of the image in our server and return in a spesific parameter that we want so in order to use this component we can pass the parameter exactly the same as in the appwrite SDK documentation which is id,width,height,quality,background,and output and it will output the image with that spesific condition which mean this component is used for cropping an image that we get from our storage.
+So this is actually the main ingredient in our tutorial what this does is to show the preview of the image in our server and return in a spesific parameter that we want so in order to use this component we can pass the parameter exactly the same as in the appwrite SDK documentation which is id, width, height, quality, background and output and it will output the image with that specific condition which means this component is used for cropping an image that we get from our storage.
 
 ```js
 import React, { useState } from 'react';
