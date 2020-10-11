@@ -661,7 +661,7 @@ output : <select onChange={(e)=>setOutput(e.target.value)}>
 
 export { PreviewAndCrop };
 ```
-example usage
+### Example usage
 
 ```js
 <PreviewAndCrop imageId={imageId} appwrite={appwrite} />
