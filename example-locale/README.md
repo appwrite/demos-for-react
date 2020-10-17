@@ -85,7 +85,7 @@ Inside our App.js we have just imported our two components. Now it's time to cre
 
 This file recieves all the json data from the Locale API. We first import the response which is basically `sdk.get();` from our index.js file. Then we use a promise to fetch the json data.
 
-We are using functional component in this file and we'll flood our state inside this promise only.
+We are using functional component in this file and we'll set our state inside this promise only.
 
 Now we'll use destructuring and extract different data such as IP and Country from our state. And then finally display it in the DOM.
 Paste the following code in the `src/components/YourInfo.js`.
