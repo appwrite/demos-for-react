@@ -83,7 +83,7 @@ Inside our App.js we have just imported our two components. Now it's time to cre
 
 ## Creating YourInfo.js
 
-This file recieves all the json data from the Local API. We first import the response which is basically `sdk.get();` from our index.js file. Then we use a promise to fetch the json data.
+This file recieves all the json data from the Locale API. We first import the response which is basically `sdk.get();` from our index.js file. Then we use a promise to fetch the json data.
 
 We are using functional component in this file and we'll flood our state inside this promise only.
 
