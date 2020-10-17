@@ -54,7 +54,7 @@ TL:DR: Create a appwrite instance and initalise it with the endpoint and Project
 
 ## Creating App.js
 
-Inside our `src/App.js` we'll be importing our two components `components/Header/js` and `components/YourInfo.js`. Header.js is just our logo and heading, where as YourInfo.js accepts the reponse of the Locale-API and displays it in the DOM.
+Inside our `src/App.js` we'll be importing our two components `components/Header.js` and `components/YourInfo.js`. Header.js is just our logo and heading, where as YourInfo.js accepts the reponse of the Locale-API and displays it in the DOM.
 
 Make a components folder in the src folder and inside it add two files, Header.js and YourInfo.js.
 For now paste the following code in the `src/App.js`.
