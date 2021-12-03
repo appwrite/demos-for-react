@@ -10,7 +10,8 @@ class App extends React.Component {
     super(props);
     this.state = { // Create the variables we will use later.
       userprofile: false,
-      error: false
+      error: false,
+      currentPage: false,
     };
   };
 
@@ -46,6 +47,25 @@ class App extends React.Component {
     }
   }
 
+  async register(email, password){
+    try {
+      // Set error to false so if we are successful the error doesn't perist making bad UX Design.
+      // also set the loading prop to true to signal to the user we are processing his request.
+      await this.setState({ error: false })
+
+      // Create the session, if this fails it will error and be caught by the catch(err).
+      await appwrite.account.create(
+        email,
+        password
+      );
+
+      await this.setState({ error: 'Register Successful'});
+    }  catch (err) {
+      await this.setState({ error: 'Invalid Credentials' }) // If login fails then show user the login was not successful.
+      console.error(err) // also console error for debugging purposes.
+    }
+  }
+
   // Logout the user function.
   async logout () {
     await this.setState({ userprofile: false }); // Remove the local copy of the userprofile causing the app to see that the user is not logged in.
@@ -62,7 +82,7 @@ class App extends React.Component {
         <div className='loginCore'>
           {!this.state.userprofile && (
             <div className='loginPage'>
-              <Login loginFunc={(email, password) => this.login(email, password)} error={() => this.state.error} />
+              <Login currentPage={this.state.currentPage} registerFunc={(email, password) => this.register(email, password)} loginFunc={(email, password) => this.login(email, password)} error={() => this.state.error} />
               <div className='loginSwitchContainer'>
                 <p>{this.state.currentPage ? 'Got an account?' : "Haven't got an account?"}</p>
                 <span onClick={() => this.setState({ currentPage: !this.state.currentPage })}>{this.state.currentPage ? 'Login' : 'Sign Up'}</span>
