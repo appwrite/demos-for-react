@@ -61,7 +61,7 @@ class App extends React.Component {
 
       await this.setState({ error: 'Register Successful'});
     }  catch (err) {
-      await this.setState({ error: 'Invalid Credentials' }) // If login fails then show user the login was not successful.
+      await this.setState({ error: 'Invalid Credentials' }) // If registration fails then show user the registration was not successful.
       console.error(err) // also console error for debugging purposes.
     }
   }
