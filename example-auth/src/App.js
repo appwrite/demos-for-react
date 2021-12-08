@@ -53,7 +53,7 @@ class App extends React.Component {
       // also set the loading prop to true to signal to the user we are processing his request.
       await this.setState({ error: false })
 
-      // Create the session, if this fails it will error and be caught by the catch(err).
+      // Create the account, if this fails it will error and be caught by the catch(err).
       await appwrite.account.create(
         email,
         password
