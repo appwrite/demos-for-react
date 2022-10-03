@@ -1,9 +1,15 @@
 import React from 'react';
-import { appwrite } from './utils';
+import {Account} from "appwrite"
+import { client } from './utils';
 import './App.css';
+
+
 
 import { Login } from './components/Login';
 import { Profile } from './components/Profile';
+
+const account = new Account(client);
+
 
 class App extends React.Component {
   constructor (props) {
@@ -18,7 +24,7 @@ class App extends React.Component {
   // Get userdata function.
   async getUserdata () {
     try {
-      const response = await appwrite.account.get(); // Request to appwrite server to see if we are logged in.
+      const response = await account.get(); // Request to appwrite server to see if we are logged in.
       this.setState({ userprofile: response }); // If Logged in then set the returned profile to the userprofile variable in state.
     } catch (err) { // If we are not logged in or another error occoured then catch(err)
       if (err.toString() === 'Error: Unauthorized') return; // If not logged in then do nothing.
@@ -35,7 +41,7 @@ class App extends React.Component {
       await this.setState({ error: false })
 
       // Create the session, if this fails it will error and be caught by the catch(err).
-      await appwrite.account.createSession(
+      await account.createEmailSession(
         email,
         password
       );
@@ -54,7 +60,11 @@ class App extends React.Component {
       await this.setState({ error: false })
 
       // Create the account, if this fails it will error and be caught by the catch(err).
-      await appwrite.account.create(
+      if(email.length===0){
+        return
+      }
+      await account.create(
+        "unique()",
         email,
         password
       );
@@ -69,10 +79,11 @@ class App extends React.Component {
   // Logout the user function.
   async logout () {
     await this.setState({ userprofile: false }); // Remove the local copy of the userprofile causing the app to see that the user is not logged in.
-    appwrite.account.deleteSession('current'); // Tell appwrite server to remove current session and complete the logout.
+    account.deleteSession('current'); // Tell appwrite server to remove current session and complete the logout.
   }
 
   componentDidMount () {
+
     this.getUserdata(); // On page load check if we are already logged in.
   }
 
