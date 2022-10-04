@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
-import appWrite from './utils';
+import { Account } from 'appwrite';
+import {appWrite }from './utils';
 import PreviewAndCrop from './components/PreviewAndCrop';
 import ListImage from './components/ListImage';
 import UploadImage from './components/UploadImage';
@@ -10,23 +11,24 @@ import SignUp from './components/SignUp';
 
 function App() {
   const [appwrite] = useState(
-    appWrite({ endpoint: 'http://localhost:4000/v1', projectId: '5f830bed0e5bf' }),
+    appWrite({ endpoint: 'http://localhost:8000/v1', projectId: '632354c21d497895d2dd' }),
   );
+  const account  = new Account(appwrite)
   const [userProfile, setUserProfile] = useState(false);
   const [currentPage, setCurrentPage] = useState(true);
   const [imageId, setImageId] = useState(null);
   async function getUserData() {
     try {
-      const response = await appwrite.account.get();
+      const response = await account.get();
       setUserProfile(response);
     } catch (err) {
-      // console.log(err);
+      console.log(err);
     }
   }
 
   async function logout() {
     await setUserProfile(false);
-    appwrite.account.deleteSession('current');
+    account.deleteSession('current');
   }
   useEffect(() => {
     getUserData();

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Account } from 'appwrite';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -44,7 +45,8 @@ export default function SignUp({ currentPage, appwrite, setCurrentPage }) {
       return;
     }
     try {
-      await appwrite.account.create(email, password);
+      const account = new Account(appwrite)
+      await account.create("unique()",email, password);
       setCurrentPage(currentPage);
     } catch (err) {
       setError(err.message);
@@ -75,6 +77,7 @@ export default function SignUp({ currentPage, appwrite, setCurrentPage }) {
             autoFocus
           />
           <TextField
+            value={password}  
             onChange={(event) => setPassword(event.target.value)}
             variant="outlined"
             margin="normal"

@@ -1,8 +1,14 @@
-import 'appwrite';
+import {Client} from "appwrite"
 
-const appwrite = new window.Appwrite();
-export default function appWrite({ endpoint, projectId }) {
+const client =new Client();
+
+const bucketID="633ba835e370fde52ce7"
+
+function appWrite({ endpoint, projectId }) {
   const ep = endpoint || 'http://localhost/v1';
   const pi = projectId || 'ProjectID';
-  return appwrite.setEndpoint(ep).setProject(pi);
+  client.setEndpoint(ep).setProject(pi);
+  return client
 }
+
+export {appWrite,bucketID}
