@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
 import { Account } from 'appwrite';
-import {appWrite }from './utils';
+import {client }from './utils';
 import PreviewAndCrop from './components/PreviewAndCrop';
 import ListImage from './components/ListImage';
 import UploadImage from './components/UploadImage';
@@ -10,9 +10,7 @@ import Login from './components/Login';
 import SignUp from './components/SignUp';
 
 function App() {
-  const [appwrite] = useState(
-    appWrite({ endpoint: 'http://localhost:8000/v1', projectId: '632354c21d497895d2dd' }),
-  );
+  const [appwrite] = useState(client);
   const account  = new Account(appwrite)
   const [userProfile, setUserProfile] = useState(false);
   const [currentPage, setCurrentPage] = useState(true);

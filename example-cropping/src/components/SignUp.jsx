@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Account } from 'appwrite';
+import { Account,ID } from 'appwrite';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -46,7 +46,7 @@ export default function SignUp({ currentPage, appwrite, setCurrentPage }) {
     }
     try {
       const account = new Account(appwrite)
-      await account.create("unique()",email, password);
+      await account.create(ID.unique(),email, password);
       setCurrentPage(currentPage);
     } catch (err) {
       setError(err.message);
