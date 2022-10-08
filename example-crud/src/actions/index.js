@@ -1,8 +1,6 @@
-import { Account,Databases } from "appwrite";
-import { client } from "../config";
+import { Account,Databases,ID } from "appwrite";
+import { client,collectionID,databaseID } from "../config";
 
-const collectionID = "633ae0beae855eba99c9";
-const databaseID="633ae03c9d2692732dbb"
 const account = new Account(client);
 const database = new Databases(client);
 
@@ -36,7 +34,7 @@ const creatUserDocument = async userData => {
     return database.createDocument(
       databaseID,
       collectionID,
-      "unique()",
+      ID.unique(),
       userData,
     );
   } catch (e) {
