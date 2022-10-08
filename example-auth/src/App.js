@@ -1,5 +1,5 @@
 import React from 'react';
-import {Account} from "appwrite"
+import {Account,ID} from "appwrite"
 import { client } from './utils';
 import './App.css';
 
@@ -64,7 +64,7 @@ class App extends React.Component {
         return
       }
       await account.create(
-        "unique()",
+        ID.unique(),
         email,
         password
       );
