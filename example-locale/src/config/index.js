@@ -1,10 +1,11 @@
-const Appwrite = require("appwrite"); //Import appwrite 
+const {Client, Locale} = require("appwrite"); //Import appwrite 
 
-let sdk  = new Appwrite();
-sdk
-  .setEndpoint("http://localhost:443/v1") // Your API Endpoint
-  .setProject("[PROJECT ID]") // Your project ID
+let client  = new Client();
+client
+  .setEndpoint("http://localhost/v1") // Your API Endpoint
+  .setProject("demos-for-react") // Your project ID
 
-let response = sdk.locale.get();
+const locale = new Locale(client);
+let response = locale.get();
 
 export {response};
