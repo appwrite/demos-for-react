@@ -1,8 +1,7 @@
-import React, {useState, useEffect} from "react";
+import React, {useState} from "react";
 import {response} from "../config/index";
 const YourInfo = () => {
   const [info, setInfo] = useState({});
-  const [weather, setWeather] = useState({});
 
   // Promise to get the location details from the Locale API.
   response.then(
