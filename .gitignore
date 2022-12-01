@@ -1,2 +1,4 @@
 node_modules
 appwrite
+.idea
+.DS_Store
