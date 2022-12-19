@@ -7,6 +7,7 @@ const YourInfo = () => {
   // Promise to get the location details from the Locale API.
   response.then(
     function (res) {
+      console.log(res);
       setInfo(res);
     },
     function (error) {

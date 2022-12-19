@@ -1,19 +1,31 @@
+import { Storage } from 'appwrite';
 import React from 'react';
+import {bucketID} from "../utils"
 
 export default function PreviewImage({ id, width, height, quality, background, output, appwrite }) {
+  const storage= new Storage(appwrite)
   function getImage() {
-    const mWidth = width || null;
-    const mHeight = height || null;
-    const mQuality = quality || 100;
-    const mBackground = background || null;
-    const mOutput = output || null;
-    const image = appwrite.storage.getFilePreview(
+    const mWidth = width || undefined;
+    const mHeight = height || undefined;
+    const mQuality = quality || undefined;
+    const mBackground = background || undefined;
+    const mOutput = output || undefined;
+    const image = storage.getFilePreview(
+      bucketID,
       id,
       mWidth,
       mHeight,
-      mQuality,
+      undefined,  //  gravity
+      mQuality,   
+      undefined,  //  borderWidth
+      undefined,  //  borderColor
+      undefined,  //  borderRadius
+      undefined,  //  opacity
+      undefined,  //  rotation
       mBackground,
-      mOutput,
+      mOutput     //  output not working
+
+
     );
 
     return image;

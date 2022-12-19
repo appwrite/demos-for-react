@@ -25,13 +25,16 @@ This should launch a server on `localhost:3000` with Live Reload.
 ## Introducing the Appwrite SDK
 With the boilerplate now complete we can now initialise the Appwrite SDK in the project before working on the login page. To keep things clean we will initialise this in it's own file, we will create this file in `src/` and call it `utils.js`. Within this file go ahead and paste the following code:
 ```js
-import 'appwrite'; // Import the appwrite library
-const appwrite = new window.Appwrite(); // The reason we use window.Appwrite() is for compatability with <script> imported appwrite.
-appwrite
-  .setEndpoint('http://localhost/v1') // We set the endpoint, change this if your using another endpoint URL.
-  .setProject('ProjectID'); // Here replace 'ProjectID' with the project ID that you created in your appwrite installation.
+import {Client} from "appwrite"  // Import the appwrite library
 
-export default { appwrite }; // Finally export the appwrite object to be used in projects.
+const client = new Client();
+ 
+client
+  .setEndpoint('http://localhost:8000/v1') // We set the endpoint, change this if your using another endpoint URL.
+  .setProject('632354c21d497895d2dd'); // Here replace 'ProjectID' with the project ID that you created in your appwrite installation.
+
+export { client}; // Finally export the client object to be used in projects.
+
 ```
 A deeper inspection of this code can be found in the comments within it, 
 
@@ -42,70 +45,112 @@ We are now going to replace the `src/App.js` with our own, doing so we will turn
 
 ```js
 import React from 'react';
-import { appwrite } from './utils';
+import {Account,ID} from "appwrite"
+import { client } from './utils';
 import './App.css';
-
 import { Login } from './components/Login';
 import { Profile } from './components/Profile';
 
+const account = new Account(client);
+
 class App extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = { // Create the variables we will use later.
-            userprofile: false,
-            error: false
-        };
+  constructor (props) {
+    super(props);
+    this.state = { // Create the variables we will use later.
+      userprofile: false,
+      error: false,
+      currentPage: false,
     };
+  };
 
-    // Get userdata function.
-    async getUserdata() {
-        try {
-            const response = await appwrite.account.get(); // Request to appwrite server to see if we are logged in.
-            this.setState({ userprofile: response }); // If Logged in then set the returned profile to the userprofile variable in state.
-        } catch (err) { // If we are not logged in or another error occoured then catch(err)
-            if (err.toString() === 'Error: Unauthorized') return; // If not logged in then do nothing.
-            this.setState({ error: err.toString() }); // If it's another error then set the error variable in state.
-            console.error(err); // and also console.error the error for clearer debugging.
-        }
+  // Get userdata function.
+  async getUserdata () {
+    try {
+      const response = await account.get(); // Request to appwrite server to see if we are logged in.
+      this.setState({ userprofile: response }); // If Logged in then set the returned profile to the userprofile variable in state.
+    } catch (err) { // If we are not logged in or another error occoured then catch(err)
+      if (err.toString() === 'Error: Unauthorized') return; // If not logged in then do nothing.
+      this.setState({ error: err.toString() }); // If it's another error then set the error variable in state.
+      console.error(err); // and also console.error the error for clearer debugging.
     }
+  }
 
-    // Login function
-    async login(email, password) {
-        try {
-            // Set error to false so if we are successful the error doesn't perist making bad UX Design.
-            // also set the loading prop to true to signal to the user we are processing his request.
-            await this.setState({ error: false })
+  // Login function
+  async login (email, password) {
+    try {
+      // Set error to false so if we are successful the error doesn't perist making bad UX Design.
+      // also set the loading prop to true to signal to the user we are processing his request.
+      await this.setState({ error: false })
 
-            // Create the session, if this fails it will error and be caught by the catch(err).
-            await appwrite.account.createSession(
-                email,
-                password
-            );
-            // If all is successful then get the userdata.
-            this.getUserdata();
-        } catch (err) {
-            await this.setState({ error: 'Invalid Credentials' }) // If login fails then show user the login was not successful.
-            console.error(err) // also console error for debugging purposes.
-        }
+      // Create the session, if this fails it will error and be caught by the catch(err).
+      await account.createEmailSession(
+        email,
+        password
+      );
+      // If all is successful then get the userdata.
+      this.getUserdata();
+    } catch (err) {
+      await this.setState({ error: 'Invalid Credentials' }) // If login fails then show user the login was not successful.
+      console.error(err) // also console error for debugging purposes.
     }
+  }
 
-    // Logout the user function.
-    async logout() {
-        await this.setState({ userprofile: false }); // Remove the local copy of the userprofile causing the app to see that the user is not logged in.
-        appwrite.account.deleteSession('current'); // Tell appwrite server to remove current session and complete the logout.
-    }
+  async register(email, password){
+    try {
+      // Set error to false so if we are successful the error doesn't perist making bad UX Design.
+      // also set the loading prop to true to signal to the user we are processing his request.
+      await this.setState({ error: false })
 
-    componentDidMount() {
-        this.getUserdata(); // On page load check if we are already logged in.
-    }
+      // Create the account, if this fails it will error and be caught by the catch(err).
+      if(email.length===0){
+        return
+      }
+      await account.create(
+        ID.unique(),
+        email,
+        password
+      );
 
-    render() {
-        return (
-	  <div>
-            Hello World!
-          </div>
-        )
+      await this.setState({ error: 'Register Successful'});
+    }  catch (err) {
+      await this.setState({ error: 'Invalid Credentials' }) // If registration fails then show user the registration was not successful.
+      console.error(err) // also console error for debugging purposes.
     }
+  }
+
+  // Logout the user function.
+  async logout () {
+    await this.setState({ userprofile: false }); // Remove the local copy of the userprofile causing the app to see that the user is not logged in.
+    account.deleteSession('current'); // Tell appwrite server to remove current session and complete the logout.
+  }
+
+  componentDidMount () {
+
+    this.getUserdata(); // On page load check if we are already logged in.
+  }
+
+  render () {
+    return (
+      <div>
+        <div className='loginCore'>
+          {!this.state.userprofile && (
+            <div className='loginPage'>
+              <Login currentPage={this.state.currentPage} registerFunc={(email, password) => this.register(email, password)} loginFunc={(email, password) => this.login(email, password)} error={() => this.state.error} />
+              <div className='loginSwitchContainer'>
+                <p>{this.state.currentPage ? 'Got an account?' : "Haven't got an account?"}</p>
+                <span onClick={() => this.setState({ currentPage: !this.state.currentPage })}>{this.state.currentPage ? 'Login' : 'Sign Up'}</span>
+              </div>
+            </div>
+          )}
+          {this.state.userprofile && (
+            <div className='loginPage'>
+              <Profile userprofile={this.state.userprofile} logout={() => this.logout()} />
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
 };
 
 export default App;

@@ -36,14 +36,18 @@ This should launch a server on `localhost:3000` with Live Reload.
 With the boilerplate now complete we can now initialise the Appwrite SDK in the project before working on the cropping tutorial. To keep things clean we will initialise this in it's own file, we will create this file in `src/` and call it `utils.js`. Within this file go ahead and paste the following code:
 
 ```js
-import 'appwrite';
+import { Client } from 'appwrite';
 
-const appwrite = new window.Appwrite();
-export default function appWrite({ endpoint, projectId }) {
-  const ep = endpoint || 'http://localhost/v1';
-  const pi = projectId || 'ProjectID';
-  return appwrite.setEndpoint(ep).setProject(pi);
-}
+const client = new Client();
+
+const bucketID = '633ba835e370fde52ce7';  // your bucket ID
+const endpoint = 'http://localhost/v1';  // Your End point
+const projectId = 'ProjectID'; //Your bucked ID
+
+client.setEndpoint(endpoint).setProject(projectId);
+
+export { bucketID, client };
+
 ```
 
 ## How To Use Cropping Using Appwrite SDK
@@ -51,15 +55,20 @@ export default function appWrite({ endpoint, projectId }) {
 To crop an image using appwrite SDK is actually pretty simple you just need to upload your file into appwrite storage then preview the image and pass the optional parameters, if you take a look at the js docs in https://appwrite.io/docs/client/storage#getFilePreview you will see all of the optional parameters and how to use it. Below is the example of how to use it using js SDK
 
 ```js
-let sdk = new Appwrite();
+import { Client, Storage } from "appwrite";
 
-sdk
-  .setEndpoint('https://[HOSTNAME_OR_IP]/v1') // Your API Endpoint
-  .setProject('5df5acd0d48c2'); // Your project ID
+const client = new Client();
 
-let result = sdk.storage.getFilePreview('[FILE_ID]', 300, null, 100, null, 'webp');
+const storage = new Storage(client);
 
-console.log(result); // Resource URL for example http://localhost/v1/storage/files/5f70694f8637d/preview?width=300&quality=100&output=webp&project=5f6f49028c5b9
+client
+    .setEndpoint('https://[HOSTNAME_OR_IP]/v1') // Your API Endpoint
+    .setProject('5df5acd0d48c2') // Your project ID
+;
+
+const result = storage.getFilePreview('[BUCKET_ID]', '[FILE_ID]');
+
+console.log(result);// Resource URL for example http://localhost/v1/storage/buckets/{bucketId}/files/{fileId}/preview
 ```
 
 using the above script we will get our image with the output that we like so for example we pass 300 as width,100 as quality and output webp we can get the exact output without the need of CDN. Appwrite will do it just like we want. Now we will create a component that can implement this functionality using react, below is the step by step procedure on how to create a simple app that can crop our image from Appwrite storage starting from signup, login, upload, list, then preview and crop.
@@ -69,22 +78,34 @@ using the above script we will get our image with the output that we like so for
 So this is actually the main ingredient in our tutorial what this does is to show the preview of the image in our server and return in a spesific parameter that we want so in order to use this component we can pass the parameter exactly the same as in the appwrite SDK documentation which is id, width, height, quality, background and output and it will output the image with that specific condition which means this component is used for cropping an image that we get from our storage.
 
 ```js
+import { Storage } from 'appwrite';
 import React from 'react';
+import {bucketID} from "../utils"
 
 export default function PreviewImage({ id, width, height, quality, background, output, appwrite }) {
+  const storage= new Storage(appwrite)
   function getImage() {
-    const mWidth = width || null;
-    const mHeight = height || null;
-    const mQuality = quality || 100;
-    const mBackground = background || null;
-    const mOutput = output || null;
-    const image = appwrite.storage.getFilePreview(
+    const mWidth = width || undefined;
+    const mHeight = height || undefined;
+    const mQuality = quality || undefined;
+    const mBackground = background || undefined;
+    const mOutput = output || undefined;
+    const image = storage.getFilePreview(
+      bucketID,
       id,
       mWidth,
       mHeight,
-      mQuality,
+      undefined,  //  gravity
+      mQuality,   
+      undefined,  //  borderWidth
+      undefined,  //  borderColor
+      undefined,  //  borderRadius
+      undefined,  //  opacity
+      undefined,  //  rotation
       mBackground,
-      mOutput,
+      mOutput     //  output not working
+
+
     );
 
     return image;
@@ -92,30 +113,14 @@ export default function PreviewImage({ id, width, height, quality, background, o
 
   return <img alt="" src={id ? getImage() : ''} />;
 }
+
 ```
 
 ### Example usage
 
 ```js
-<PreviewImage
-  appwrite={appwrite}
-  width={width}
-  height={height}
-  quality={quality}
-  background={background}
-  output={output}
-  id={imageId}
-/>
-```
-
-The props that you can use in this component are actually the same as in the Appwrite SDK which is id, width, height, quality, background, and output. You can check the function in the docs [here](https://appwrite.io/docs/client/storage#getFilePreview)
-
-## Step 2 - Create SignUp Component
-
-This component is used for sign up to our appwrite server using appwrite SDK in order to login you should sign up first to appwrite server using appwrite SDK.
-
-```js
 import React, { useState } from 'react';
+import { Account,ID } from 'appwrite';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -161,7 +166,8 @@ export default function SignUp({ currentPage, appwrite, setCurrentPage }) {
       return;
     }
     try {
-      await appwrite.account.create(email, password);
+      const account = new Account(appwrite)
+      await account.create(ID.unique(),email, password);
       setCurrentPage(currentPage);
     } catch (err) {
       setError(err.message);
@@ -192,6 +198,7 @@ export default function SignUp({ currentPage, appwrite, setCurrentPage }) {
             autoFocus
           />
           <TextField
+            value={password}  
             onChange={(event) => setPassword(event.target.value)}
             variant="outlined"
             margin="normal"
@@ -226,6 +233,7 @@ export default function SignUp({ currentPage, appwrite, setCurrentPage }) {
     </Container>
   );
 }
+
 ```
 
 ### Example usage
@@ -258,6 +266,7 @@ import Typography from '@material-ui/core/Typography';
 import Alert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import { Account } from 'appwrite';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -288,7 +297,8 @@ export default function Login(props) {
     setLoading(true);
     try {
       setError(false);
-      await props.appwrite.account.createSession(email, password);
+      const account = new Account(props.appwrite)
+      await account.createEmailSession(email, password);
       props.getUserData();
     } catch (err) {
       setError(err.message);
@@ -389,16 +399,18 @@ UploadImage component is used for uploading an image using the Appwrite SDK. Upl
 ```js
 import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
+import { Storage,ID } from 'appwrite';
+import {bucketID} from "../utils"
 
 export default function UploadImage(props) {
   const [loading, setLoading] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
   const [error, setError] = useState(false);
-
   const processUpload = async (_props) => {
     setLoading(true);
     try {
-      await _props.appwrite.storage.createFile(uploadFile, ['*'], ['*']);
+      const storage=new Storage(_props.appwrite);
+      await storage.createFile(bucketID,ID.unique(),uploadFile);
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -427,6 +439,7 @@ export default function UploadImage(props) {
     </div>
   );
 }
+
 ```
 
 ### Example usage
@@ -438,7 +451,7 @@ export default function UploadImage(props) {
 This only take one props which is ```appwrite``` for connecting to our server using Appwrite SDK
 
 ```js
-await appwrite.storage.createFile(uploadFile, ['*'], ['*']);
+await storage.createFile(bucketID,ID.unique(),uploadFile);
 ```
 
 This is actually for creating any file but in this tutorial we will use it to create an image file and this function takes three parameters. You can take a look the detailed explanation here https://appwrite.io/docs/client/storage#createFile
@@ -451,15 +464,18 @@ So after we're done uploading our image we would want to see all of our images t
 import React, { useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import { Storage } from 'appwrite';
 import PreviewImage from './PreviewImage';
+import {bucketID} from "../utils"
 
 export default function ListImage(props) {
   const [listImages, setListImages] = useState([]);
   const [active, setActive] = useState(null);
   async function getAllImages() {
-    const images = await props.appwrite.storage.listFiles();
+    const storage= new Storage(props.appwrite)
+    const images = await storage.listFiles(bucketID);
     const me = [...images.files];
-
+    console.log(me);
     setListImages(me);
   }
 
@@ -490,7 +506,7 @@ export default function ListImage(props) {
           ? listImages.map((a, index) => {
               // eslint-disable-next-line no-param-reassign
               a.color = active === index ? 'solid' : 'none';
-
+             
               return (
                 <Grid
                   container
@@ -511,6 +527,7 @@ export default function ListImage(props) {
     </div>
   );
 }
+
 ```
 
 ### Example usage
@@ -672,7 +689,8 @@ So in order for this application to work we should put all of our components int
 import React, { useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import Container from '@material-ui/core/Container';
-import appWrite from './utils';
+import { Account } from 'appwrite';
+import {client }from './utils';
 import PreviewAndCrop from './components/PreviewAndCrop';
 import ListImage from './components/ListImage';
 import UploadImage from './components/UploadImage';
@@ -680,24 +698,23 @@ import Login from './components/Login';
 import SignUp from './components/SignUp';
 
 function App() {
-  const [appwrite] = useState(
-    appWrite({ endpoint: 'http://localhost:4000/v1', projectId: '5f830bed0e5bf' }),
-  );
+  const [appwrite] = useState(client);
+  const account  = new Account(appwrite)
   const [userProfile, setUserProfile] = useState(false);
   const [currentPage, setCurrentPage] = useState(true);
   const [imageId, setImageId] = useState(null);
   async function getUserData() {
     try {
-      const response = await appwrite.account.get();
+      const response = await account.get();
       setUserProfile(response);
     } catch (err) {
-      // console.log(err);
+      console.log(err);
     }
   }
 
   async function logout() {
     await setUserProfile(false);
-    appwrite.account.deleteSession('current');
+    account.deleteSession('current');
   }
   useEffect(() => {
     getUserData();
@@ -735,6 +752,7 @@ function App() {
 }
 
 export default App;
+
 ```
 
 So here's what our final application looks like. There are 4 state variables that we use
