@@ -1,18 +1,19 @@
 import { Models } from "appwrite";
 import { useEffect, useState } from "react";
-import { getLanguages } from "../appwrite";
+import { getEUCountries } from "../../appwrite";
 
-export default function Languages() {
-  const [info, setInfo] = useState<Models.LanguageList | undefined>();
+export default function EUCountries() {
+  const [info, setInfo] = useState<Models.CountryList | undefined>();
 
   useEffect(() => {
-    getLanguages()
+    getEUCountries()
       .then((i) => setInfo(i))
   }, [])
 
+
   return (
     <>
-    <h1>Languages</h1>
+          <h1>EU Countries List</h1>
 
     <div className="info">
         <table>
@@ -20,11 +21,10 @@ export default function Languages() {
                 <tr>
                     <th>Code</th>
                     <th>Name</th>
-                    <th>Native Name</th>
                 </tr>
             </thead>
             <tbody>
-                {info?.total && info.languages.map(c => {
+                {info?.total && info.countries.map(c => {
                     return(
                         <tr key={c.code}>
                             <th>
@@ -32,9 +32,6 @@ export default function Languages() {
                             </th>
                             <th>
                                 {c?.name}
-                            </th>
-                            <th>
-                                {c?.nativeName}
                             </th>
                         </tr>
                     )})}

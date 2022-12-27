@@ -1,6 +1,6 @@
 import { Models } from "appwrite";
 import { useEffect, useState } from "react";
-import { getCurrencies } from "../appwrite";
+import { getCurrencies } from "../../appwrite";
 
 export default function Currencies() {
   const [info, setInfo] = useState<Models.CurrencyList | undefined>();

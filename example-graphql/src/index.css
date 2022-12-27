@@ -1,10 +1,9 @@
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
+  font-size: 20px;
   line-height: 24px;
   font-weight: 400;
   color: #FFF;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -12,7 +11,7 @@
   -webkit-text-size-adjust: 100%;
 
   --dark-gray: #242424;
-  --appwrite-primary: #f02e65
+  --appwrite-primary: 240,46,101
 }
 
 html {
@@ -23,7 +22,8 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  height: 90vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 button {
@@ -40,7 +40,7 @@ button {
 }
 
 button:hover {
-  border-color: var(--appwrite-primary);
+  border-color: rgba(rgba(var(--appwrite-primary), 1));
 }
 
 button:focus,
@@ -49,31 +49,30 @@ button:focus-visible {
 }
 
 .navigation-bar {
+  width: 100%;
   display: flex;
-  position: fixed;
-  top: 0;
-  padding: 1em;
-  width: 90vw;
   justify-content: space-around;
   list-style-type: none;
   background-color: var(--dark-gray);
 }
 
 a {
-  color: var(--appwrite-primary);
+  color: rgba(var(--appwrite-primary), 1);
   text-decoration: none;
   transition: filter .15s;
+  padding: .5rem;
 }
 
 a:hover {
   filter: brightness(0.85);
+  background-color: rgba(var(--appwrite-primary), 0.1);
 }
 
 .content {
   display: flex;
   height: 100%;
   flex-direction: column;
-  justify-content: center;
+  /* justify-content: center; */
   align-items: center;
 }
 

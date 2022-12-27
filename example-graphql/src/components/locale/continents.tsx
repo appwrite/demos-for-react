@@ -1,41 +1,37 @@
 import { Models } from "appwrite";
 import { useEffect, useState } from "react";
-import { getCountriesPhones } from "../appwrite";
+import { getContinents } from "../../appwrite";
 
-export default function Phones() {
-  const [info, setInfo] = useState<Models.PhoneList | undefined>();
+export default function Continents() {
+  const [info, setInfo] = useState<Models.ContinentList | undefined>();
 
   useEffect(() => {
-    getCountriesPhones()
+    getContinents()
       .then((i) => setInfo(i))
   }, [])
 
 
   return (
     <>
-          <h1>Phone Codes</h1>
+          <h1>Continents</h1>
 
     <div className="info">
         <table>
             <thead>
                 <tr>
                     <th>Code</th>
-                    <th>Country Code</th>
                     <th>Name</th>
                 </tr>
             </thead>
             <tbody>
-                {info?.total && info.phones.map(c => {
+                {info?.total && info.continents.map(c => {
                     return(
                         <tr key={c.code}>
                             <th>
                                 {c?.code}
                             </th>
                             <th>
-                                {c?.countryCode}
-                            </th>
-                            <th>
-                                {c?.countryName}
+                                {c?.name}
                             </th>
                         </tr>
                     )})}

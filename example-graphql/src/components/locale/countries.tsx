@@ -1,19 +1,19 @@
 import { Models } from "appwrite";
 import { useEffect, useState } from "react";
-import { getContinents } from "../appwrite";
+import { getCountries } from "../../appwrite";
 
-export default function Continents() {
-  const [info, setInfo] = useState<Models.ContinentList | undefined>();
+export default function Countries() {
+  const [info, setInfo] = useState<Models.CountryList | undefined>();
 
   useEffect(() => {
-    getContinents()
+    getCountries()
       .then((i) => setInfo(i))
   }, [])
 
 
   return (
     <>
-          <h1>Continents</h1>
+          <h1>Countries List</h1>
 
     <div className="info">
         <table>
@@ -24,7 +24,7 @@ export default function Continents() {
                 </tr>
             </thead>
             <tbody>
-                {info?.total && info.continents.map(c => {
+                {info?.total && info.countries.map(c => {
                     return(
                         <tr key={c.code}>
                             <th>
