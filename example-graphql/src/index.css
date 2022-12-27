@@ -23,7 +23,11 @@ body {
   flex-direction: column;
   justify-content: center;
   height: 100vh;
-  overflow: hidden;
+  margin: 0;
+}
+
+ul{
+  padding-inline-start: 0;
 }
 
 button {
@@ -64,6 +68,11 @@ a {
 }
 
 a:hover {
+  filter: brightness(0.85);
+  background-color: rgba(var(--appwrite-primary), 0.1);
+}
+
+.active {
   filter: brightness(0.85);
   background-color: rgba(var(--appwrite-primary), 0.1);
 }

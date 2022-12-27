@@ -1,5 +1,4 @@
-import { Outlet, Link } from "react-router-dom"
-import appwriteLogo from "../../../public/appwrite.svg"
+import { Outlet, NavLink } from "react-router-dom"
 
 export default function LocaleLayout() {
   return (
@@ -7,22 +6,25 @@ export default function LocaleLayout() {
       <nav className="locale-nav">
         <ul className="navigation-bar">
           <li>
-            <Link to="/locale/countries">Countries</Link>
+            <NavLink to="/locale/countries">Countries</NavLink>
           </li>
           <li>
-            <Link to="/locale/eu-countries">EU Countries</Link>
+            <NavLink to="/locale/eu-countries">EU Countries</NavLink>
           </li>
           <li>
-            <Link to="/locale/phone-codes">Phone Codes</Link>
+            <NavLink to="/locale/phone-codes">Phone Codes</NavLink>
           </li>
           <li>
-            <Link to="/locale/continents">Continents</Link>
+            <NavLink to="/locale/continents">Continents</NavLink>
           </li>
           <li>
-            <Link to="/locale/currencies">Currencies</Link>
+            <NavLink to="/locale/currencies">Currencies</NavLink>
           </li>
           <li>
-            <Link to="/locale/languages">Languages</Link>
+            <NavLink to="/locale/languages">Languages</NavLink>
+          </li>
+          <li>
+            <NavLink to="/locale/all">All</NavLink>
           </li>
         </ul>
       </nav>

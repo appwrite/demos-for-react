@@ -162,4 +162,84 @@ export const getLanguages = async () => {
   }
 }
 
+export const getAllLocale = async () => {
+  try {
+    const q = await graphql.query({
+      query: `query {
+        localeGet {
+          ip
+          countryCode
+          country
+          continentCode
+          continent
+          eu
+          currency
+        }
+        localeListCountries {
+          total
+          countries{
+            name
+            code
+          }
+        }
+        localeListCountriesEU {
+          total
+          countries{
+            name
+            code
+          }
+        }
+        localeListCountriesPhones {
+          total
+          phones{
+            code
+            countryCode
+            countryName
+          }
+        }
+        localeListContinents {
+          total
+          continents{
+            code
+            name
+          }
+        }
+        localeListCurrencies {
+          total
+          currencies{
+            symbol
+            name
+            symbolNative
+            decimalDigits
+            rounding
+            code
+            namePlural
+          }
+        }
+        localeListLanguages {
+          total
+          languages{
+            name
+            code
+            nativeName
+          }
+        }
+    }`
+  }) as {data: {
+    localeGet: Models.Locale,
+    localeListCountries: Models.CountryList,
+    localeListCountriesEU: Models.CountryList,
+    localeListCountriesPhones: Models.PhoneList,
+    localeListContinents: Models.ContinentList,
+    localeListCurrencies: Models.CurrencyList,
+    localeListLanguages: Models.LanguageList
+  }};  
+
+  return q.data;
+} catch (error) {
+    const appwriteError = error as AppwriteException;
+    throw new Error(appwriteError.message)
+  }
+}
+
 export default client;

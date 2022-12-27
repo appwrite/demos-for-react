@@ -3,9 +3,9 @@ import appwriteLogo from "../../public/appwrite.svg"
 export default function Home() {
   return (
     <>
-      <div className="appwrite-logo">
+      <a className="appwrite-logo" href="https://appwrite.io/" target="_blank" rel="noreferrer noopener">
         <img src={appwriteLogo} alt="Appwrite's logo" />
-      </div>
+      </a>
       <div className="info">
         Welcome
       </div>

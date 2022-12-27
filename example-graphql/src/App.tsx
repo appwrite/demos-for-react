@@ -10,6 +10,7 @@ import Phones from "./components/locale/phones"
 import Continents from "./components/locale/continents"
 import Currencies from "./components/locale/currencies"
 import Languages from "./components/locale/languages"
+import All from "./components/locale/all"
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
             <Route path="/locale/continents" element={<Continents />} />
             <Route path="/locale/currencies" element={<Currencies />} />
             <Route path="/locale/languages" element={<Languages />} />
+            <Route path="/locale/all" element={<All />} />
           </Route>
         </Route>
       </Routes>

@@ -1,4 +1,4 @@
-import { Outlet, Link } from "react-router-dom"
+import { Outlet, NavLink } from "react-router-dom"
 import Footer from "./footer"
 
 export default function Layout() {
@@ -7,10 +7,10 @@ export default function Layout() {
       <nav>
         <ul className="navigation-bar">
           <li>
-            <Link to="/">Home</Link>
+            <NavLink to="/">Home</NavLink>
           </li>
           <li>
-            <Link to="/locale">Locale</Link>
+            <NavLink to="/locale">Locale</NavLink>
           </li>
         </ul>
       </nav>
