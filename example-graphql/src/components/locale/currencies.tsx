@@ -1,13 +1,20 @@
 import { Models } from "appwrite";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getCurrencies } from "../../appwrite";
 
 export default function Currencies() {
   const [info, setInfo] = useState<Models.CurrencyList | undefined>();
 
+  const effectRan = useRef(false);
   useEffect(() => {
-    getCurrencies()
-      .then((i) => setInfo(i))
+    if(effectRan.current === false){ 
+      getCurrencies()
+        .then((i) => setInfo(i))
+      
+      return () => {
+        effectRan.current = true;
+      }
+    }
   }, [])
 
   return (

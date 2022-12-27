@@ -1,13 +1,20 @@
 import { Models } from "appwrite";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getContinents } from "../../appwrite";
 
 export default function Continents() {
   const [info, setInfo] = useState<Models.ContinentList | undefined>();
 
+  const effectRan = useRef(false);
   useEffect(() => {
-    getContinents()
-      .then((i) => setInfo(i))
+    if(effectRan.current === false){ 
+      getContinents()
+        .then((i) => setInfo(i))
+      
+      return () => {
+        effectRan.current = true;
+      }
+    }
   }, [])
 
 

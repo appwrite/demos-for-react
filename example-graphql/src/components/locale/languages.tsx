@@ -1,13 +1,20 @@
 import { Models } from "appwrite";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getLanguages } from "../../appwrite";
 
 export default function Languages() {
   const [info, setInfo] = useState<Models.LanguageList | undefined>();
 
+  const effectRan = useRef(false);
   useEffect(() => {
-    getLanguages()
-      .then((i) => setInfo(i))
+    if(effectRan.current === false){ 
+      getLanguages()
+        .then((i) => setInfo(i))
+      
+      return () => {
+        effectRan.current = true;
+      }
+    }
   }, [])
 
   return (

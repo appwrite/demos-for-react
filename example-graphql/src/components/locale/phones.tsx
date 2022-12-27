@@ -1,13 +1,20 @@
 import { Models } from "appwrite";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getCountriesPhones } from "../../appwrite";
 
 export default function Phones() {
   const [info, setInfo] = useState<Models.PhoneList | undefined>();
 
+  const effectRan = useRef(false);
   useEffect(() => {
-    getCountriesPhones()
-      .then((i) => setInfo(i))
+    if(effectRan.current === false){ 
+        getCountriesPhones()
+        .then((i) => setInfo(i))
+      
+      return () => {
+        effectRan.current = true;
+      }
+    }
   }, [])
 
 

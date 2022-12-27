@@ -1,5 +1,5 @@
 import { Models } from "appwrite";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getAllLocale } from "../../appwrite";
 
 export default function All() {
@@ -13,9 +13,16 @@ export default function All() {
     localeListLanguages: Models.LanguageList
   } | undefined>();
 
+  const effectRan = useRef(false);
   useEffect(() => {
-    getAllLocale()
-      .then((i) => setInfo(i))
+    if(effectRan.current === false){ 
+      getAllLocale()
+        .then((i) => setInfo(i))
+      
+      return () => {
+        effectRan.current = true;
+      }
+    }
   }, [])
 
 

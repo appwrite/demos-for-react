@@ -1,13 +1,19 @@
 import { Models } from "appwrite";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getLocale } from "../../appwrite";
 
 export default function Locale() {
   const [info, setInfo] = useState<Models.Locale | undefined>();
-
+  const effectRan = useRef(false);
   useEffect(() => {
-    getLocale()
-      .then((i) => setInfo(i))
+    if(effectRan.current === false){ 
+      getLocale()
+        .then((i) => setInfo(i))
+      
+      return () => {
+        effectRan.current = true;
+      }
+    }
   }, [])
 
 
