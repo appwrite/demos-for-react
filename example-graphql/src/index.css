@@ -1,0 +1,118 @@
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  color: #FFF;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  --dark-gray: #242424;
+  --appwrite-primary: #f02e65
+}
+
+html {
+  background-color: var(--dark-gray);
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 90vh;
+}
+
+button {
+  border-radius: 8px;
+  color: #fff;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: var(--appwrite-primary);
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+.navigation-bar {
+  display: flex;
+  position: fixed;
+  top: 0;
+  padding: 1em;
+  width: 90vw;
+  justify-content: space-around;
+  list-style-type: none;
+  background-color: var(--dark-gray);
+}
+
+a {
+  color: var(--appwrite-primary);
+  text-decoration: none;
+  transition: filter .15s;
+}
+
+a:hover {
+  filter: brightness(0.85);
+}
+
+.content {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.appwrite-logo {
+  width: 18em;
+  margin: auto;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  justify-content: center;
+  background-color: var(--dark-gray);
+}
+
+@media screen and (min-width: 768px) {
+  footer {
+    flex-direction: row;
+    gap: 0.25em;
+  }
+}
+
+.info{
+  flex: 1;
+  overflow-y: auto;
+  max-height: calc(100vh - 360px)
+}
+
+table{
+  width: 100%;
+  height: 100%;
+}
