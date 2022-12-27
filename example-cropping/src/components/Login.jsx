@@ -7,6 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import Alert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+import { Account } from 'appwrite';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -29,6 +30,7 @@ export default function Login(props) {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  
   async function login(e) {
     e.preventDefault();
 
@@ -37,7 +39,8 @@ export default function Login(props) {
     setLoading(true);
     try {
       setError(false);
-      await props.appwrite.account.createSession(email, password);
+      const account = new Account(props.appwrite)
+      await account.createEmailSession(email, password);
       props.getUserData();
     } catch (err) {
       setError(err.message);

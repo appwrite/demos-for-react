@@ -59,9 +59,9 @@ const Routes = () => {
   return (
     <Router>
       <Switch>
-        <Route exact path={"/"} render={props => <Home {...props} />} />
-        <Route exact path={"/users"} render={props => <Users {...props} />} />
-        <Route exact path={"/login"} render={props => <Login {...props} />} />
+        <Route exact path={"/"} render={(props) => <Home {...props} />} />
+        <Route exact path={"/users"} render={(props) => <Users {...props} />} />
+        <Route exact path={"/login"} render={(props) => <Login {...props} />} />
         <Route exact path={"*"} component={Home} /> //If the route does not matches
         it will return the homepage
       </Switch>
@@ -95,11 +95,11 @@ const Login = () => {
   useEffect(() => {
     //retrieving user profile data from the backend when the Login component is mounted (Similar to the use of componentDidMount())
     getUserData() //this function is declared in '/src/actions/index.js' file
-      .then(response => {
+      .then((response) => {
         setProfile(response);
         setLoading(false);
       })
-      .catch(e => {
+      .catch((e) => {
         console.log(e.message);
         setLoading(false);
         setProfile(false);
@@ -117,7 +117,7 @@ const Login = () => {
     //by providing email and password, the user is logged in and redirected to the User Dashboard
     login(email, password) //this function is declared in '/src/actions/index.js' file
       .then(() => history.push("/users"))
-      .catch(err => {
+      .catch((err) => {
         setError(err.message);
       });
   };
@@ -147,7 +147,7 @@ const Login = () => {
                   <input
                     type={"email"}
                     placeholder="Email"
-                    onChange={e => setEmail(e.target.value)}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </Form.Field>
                 <Form.Field>
@@ -155,7 +155,7 @@ const Login = () => {
                   <input
                     type={"password"}
                     placeholder="Password"
-                    onChange={e => setPassword(e.target.value)}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </Form.Field>
                 <Form.Field>
@@ -196,11 +196,11 @@ const Home = () => {
 
   useEffect(() => {
     getUserData()
-      .then(response => {
+      .then((response) => {
         setProfile(response);
         setLoading(false);
       })
-      .catch(e => {
+      .catch((e) => {
         console.log(e.message);
         setProfile(false);
         setLoading(false);
@@ -278,7 +278,7 @@ import {
   deleteUserDocument,
   getUserData,
   getUserDocuments,
-  updateUserDocument
+  updateUserDocument,
 } from "../../actions";
 import Spinner from "../../helpers/Spinner";
 import { Link, Redirect } from "react-router-dom";
@@ -292,7 +292,7 @@ import {
   Modal,
   Header,
   Form,
-  Message
+  Message,
 } from "semantic-ui-react";
 
 const Users = () => {
@@ -309,7 +309,7 @@ const Users = () => {
 
   useEffect(() => {
     getUserData()
-      .then(response => {
+      .then((response) => {
         setProfile(response);
         getUserDocuments().then(({ documents }) => setUsersList(documents)); //the action for getting all the user documents from the database
       })
@@ -324,13 +324,13 @@ const Users = () => {
         setLoading(false);
         setVisibleAddModal(false);
       })
-      .catch(e => {
+      .catch((e) => {
         setLoading(false);
         setError(e.message);
       });
   };
 
-  const handleUpdateUser = documentID => {
+  const handleUpdateUser = (documentID) => {
     setLoading(true);
     updateUserDocument({ documentID, name, email }) //the action for updating the user
       .then(() => {
@@ -338,13 +338,13 @@ const Users = () => {
         setLoading(false);
         setVisibleUpdateModal(false);
       })
-      .catch(e => {
+      .catch((e) => {
         setLoading(false);
         setError(e.message);
       });
   };
 
-  const handleDeleteUser = documentID => {
+  const handleDeleteUser = (documentID) => {
     setLoading(true);
     deleteUserDocument(documentID) //the action for deleting a specific user
       .then(() => {
@@ -352,7 +352,7 @@ const Users = () => {
         setLoading(false);
         setVisibleDeleteModal(false);
       })
-      .catch(e => {
+      .catch((e) => {
         setLoading(false);
         setError(e.message);
       });
@@ -428,7 +428,7 @@ const Users = () => {
                         <input
                           type={"text"}
                           value={userID}
-                          onChange={e => setUserID(e.target.value)}
+                          onChange={(e) => setUserID(e.target.value)}
                           placeholder="UserID"
                         />
                       </Form.Field>
@@ -437,7 +437,7 @@ const Users = () => {
                         <input
                           type={"text"}
                           value={name}
-                          onChange={e => setName(e.target.value)}
+                          onChange={(e) => setName(e.target.value)}
                           placeholder="Name"
                         />
                       </Form.Field>
@@ -446,7 +446,7 @@ const Users = () => {
                         <input
                           type={"email"}
                           value={email}
-                          onChange={e => setEmail(e.target.value)}
+                          onChange={(e) => setEmail(e.target.value)}
                           placeholder="Email"
                         />
                       </Form.Field>
@@ -526,7 +526,7 @@ const Users = () => {
                                 <input
                                   type={"text"}
                                   value={name}
-                                  onChange={e => setName(e.target.value)}
+                                  onChange={(e) => setName(e.target.value)}
                                   placeholder="Name"
                                 />
                               </Form.Field>
@@ -535,7 +535,7 @@ const Users = () => {
                                 <input
                                   type={"email"}
                                   value={email}
-                                  onChange={e => setEmail(e.target.value)}
+                                  onChange={(e) => setEmail(e.target.value)}
                                   placeholder="Email"
                                 />
                               </Form.Field>
@@ -628,46 +628,44 @@ What we are doing here is that we are getting the user data from the backend and
 Now let's see how the Appwrite SDK is used to do this awesome CRUD tasks. Let's create `/src/actions/index.js` file.
 
 ```js
-import { appwrite } from "../config";
+import { Account, Databases, ID } from "appwrite";
+import { client, collectionID, databaseID } from "../config";
 
-const collectionID = "[COLLECTION-ID]"; //you have to provide your collection-id here. You can create a new collection from the Appwrite console.
+const account = new Account(client);
+const database = new Databases(client);
 
 const getUserData = async () => {
-  //action to get the current logged in user data
   try {
-    return appwrite.account.get();
+    return account.get();
   } catch (e) {
     console.error(e.message);
   }
 };
 
 const login = async (email, password) => {
-  //action to login
   try {
-    return appwrite.account.createSession(email, password);
+    return account.createEmailSession(email, password);
   } catch (e) {
     console.error(e.message);
   }
 };
 
-const logout = async history => {
-  //action to logout
+const logout = async (history) => {
   try {
-    await appwrite.account.deleteSession("current");
+    await account.deleteSession("current");
     return history.push("/login");
   } catch (e) {
     console.error(e.message);
   }
 };
 
-const creatUserDocument = async userData => {
-  //action to create a new record in the database
+const creatUserDocument = async (userData) => {
   try {
-    return appwrite.database.createDocument(
-      collectionID, //collection-id where the record is stored
-      userData, //the record itself
-      ["*"], //read permissions (here we provide the "Wildcard " permission)
-      ["*"] //write permissions (here we provide the "Wildcard " permission)
+    return database.createDocument(
+      databaseID,
+      collectionID,
+      ID.unique(),
+      userData
     );
   } catch (e) {
     console.error(e.message);
@@ -675,33 +673,27 @@ const creatUserDocument = async userData => {
 };
 
 const getUserDocuments = async () => {
-  //action to get all the records from the database
   try {
-    return appwrite.database.listDocuments(collectionID);
+    return database.listDocuments(databaseID, collectionID);
   } catch (e) {
     console.error(e.message);
   }
 };
 
 const updateUserDocument = async ({ documentID, name, email }) => {
-  //action to update the record
   try {
-    return appwrite.database.updateDocument(
-      collectionID, //the collection-id
-      documentID, //the document-id of the record that we are updating
-      { name, email }, //fields and data that needs to be updated in the record
-      ["*"], //read permissions (here we provide the "Wildcard " permission)
-      ["*"] //write permissions (here we provide the "Wildcard " permission)
-    );
+    return database.updateDocument(databaseID, collectionID, documentID, {
+      name,
+      email,
+    });
   } catch (e) {
     console.error(e.message);
   }
 };
 
-const deleteUserDocument = async documentID => {
-  //action to delete a record from the database
+const deleteUserDocument = async (documentID) => {
   try {
-    return appwrite.database.deleteDocument(collectionID, documentID);
+    return database.deleteDocument(databaseID, collectionID, documentID);
   } catch (e) {
     console.error(e.message);
   }
@@ -714,7 +706,7 @@ export {
   creatUserDocument,
   getUserDocuments,
   updateUserDocument,
-  deleteUserDocument
+  deleteUserDocument,
 };
 ```
 
@@ -804,13 +796,13 @@ Since we have moved the heavy stuff, let's move on to creating the functions to 
 To create a record we have to use the Appwrite's Create Document API endpoint. The SDK provides a function for this. Let's implement it.
 
 ```js
-const creatUserDocument = async userData => {
+const creatUserDocument = async (userData) => {
   try {
-    return appwrite.database.createDocument(
+    return database.createDocument(
+      databaseID, //database-id where the record is stored
       collectionID, //collection-id where the record is stored
-      userData, //the record itself
-      ["*"], //read permissions (here we provide the "Wildcard " permission)
-      ["*"] //write permissions (here we provide the "Wildcard " permission)
+      ID.unique(), //A unique ID need to pass
+      userData //the record itself
     );
   } catch (e) {
     console.error(e.message);
@@ -818,29 +810,36 @@ const creatUserDocument = async userData => {
 };
 ```
 
-In this `appwrite.database.createDocument` function we have to provide four required parameters.
+In this `database.createDocument` function we have to provide four required parameters.
 
 1. CollectionID
-2. The data of the record (A JSON object containing all the record data)
-3. Read Permissions for this specific record. (Provided in an array)
-4. Write Permissions for this specific record. (Provided in an array)
+2. CollectionID
+3. Unique string
+4. The data of the record (A JSON object containing all the record data)
 
-As read write permissions of each record, I have given `Wildcard` permissions, which means it is publicly accessible for read and write. For more information about Create Document function, you can refer to the [main documentation](https://appwrite.io/docs/client/database?sdk=web#createDocument). When we are creating a document, the database will automatically create a `documentID` for the record. This `documentID` is needed when updating or deleting a document.
+The user that create this document can only delete.
+
+For more information about Create Document function, you can refer to the [main documentation](https://appwrite.io/docs/client/database?sdk=web#createDocument). When we are creating a document, the database will automatically create a `documentID` for the record. This `documentID` is needed when updating or deleting a document.
 
 After Create Document function is called, upon success, the response will be this.
 
 ```json
 {
-  "$id": "5f6afdd185b8e",
-  "$permissions": { "read": ["*"], "write": ["*"] },
-  "userID": "#123",
-  "name": "Ed Sheeran",
-  "email": "ed.sheeran@gmail.com",
-  "$collection": "5f69c0a24b1cb"
+  "userID": "433",
+  "name": "Omji Kushwaha",
+  "email": "omjikush09@gmail.com",
+  "$id": "6341c3f2b99f6303fae5",
+  "$permissions": [
+    "read(\"user:6341c2092738b132eb80\")",
+    "update(\"user:6341c2092738b132eb80\")",
+    "delete(\"user:6341c2092738b132eb80\")"
+  ],
+  "$createdAt": "2022-10-08T18:39:46.761+00:00",
+  "$updatedAt": "2022-10-08T18:39:46.761+00:00",
+  "$collectionId": "633ae0beae855eba99c9",
+  "$databaseId": "633ae03c9d2692732dbb"
 }
 ```
-
-Keep in mind that, `$id` is the `documentID` of the created document.
 
 #### Read (list) the records
 
@@ -849,49 +848,56 @@ Since we have created a record, we can list the records from the database. To do
 ```js
 const getUserDocuments = async () => {
   try {
-    return appwrite.database.listDocuments(collectionID);
+    return database.listDocuments(databaseID, collectionID);
   } catch (e) {
     console.error(e.message);
   }
 };
 ```
 
-This function is pretty straightforward, we only have to provide the `collectionID`. For more information about listing documents you can go through the [documentation](https://appwrite.io/docs/client/database?sdk=web#listDocuments).
+This function is pretty straightforward, we have to provide the `collectionID` and `databaseId` . For more information about listing documents you can go through the [documentation](https://appwrite.io/docs/client/database?sdk=web#listDocuments).
 
 The response of List Documents function is as follows.
 
 ```json
 {
-  "$id": "5f69c0a24b1cb",
-  "$collection": 0,
-  "$permissions": { "read": ["*"], "write": ["*"] },
-  "name": "users",
-  "dateCreated": 1600766114,
-  "dateUpdated": 1600843736,
-  "structure": true,
-  "sum": 2,
+  "total": 2,
   "documents": [
     {
-      "$id": "5f6a3c0f982c8",
-      "$collection": "5f69c0a24b1cb",
-      "$permissions": { "read": ["*"], "write": ["*"] },
-      "userID": "#1234",
-      "name": "John Smith",
-      "email": "john.smith@gmail.com"
+      "userID": "1224",
+      "name": "Omji Kushwaha",
+      "email": "omjicompaq6@gmail.com",
+      "$id": "6341c3d69b24b0ddb662",
+      "$createdAt": "2022-10-08T18:39:18.636+00:00",
+      "$updatedAt": "2022-10-08T18:39:18.636+00:00",
+      "$permissions": [
+        "read(\"user:6341c2092738b132eb80\")",
+        "update(\"user:6341c2092738b132eb80\")",
+        "delete(\"user:6341c2092738b132eb80\")"
+      ],
+      "$collectionId": "633ae0beae855eba99c9",
+      "$databaseId": "633ae03c9d2692732dbb"
     },
     {
-      "$id": "5f6a3ef2ee1e7",
-      "$collection": "5f69c0a24b1cb",
-      "$permissions": { "read": ["*"], "write": ["*"] },
-      "userID": "#12345",
-      "name": "Jason Drake",
-      "email": "jason.drake@gmail.com"
+      "userID": "433",
+      "name": "Omji Kushwaha",
+      "email": "omjikush09@gmail.com",
+      "$id": "6341c3f2b99f6303fae5",
+      "$createdAt": "2022-10-08T18:39:46.761+00:00",
+      "$updatedAt": "2022-10-08T18:39:46.761+00:00",
+      "$permissions": [
+        "read(\"user:6341c2092738b132eb80\")",
+        "update(\"user:6341c2092738b132eb80\")",
+        "delete(\"user:6341c2092738b132eb80\")"
+      ],
+      "$collectionId": "633ae0beae855eba99c9",
+      "$databaseId": "633ae03c9d2692732dbb"
     }
   ]
 }
 ```
 
-Keep in mind that the `$id` in the parent object is the CollectionID. All the documents are listed under the `documents` field. Each object inside `documents` array represents a record in the `Users` collection. So the `documentID` of each document is denoted as `$id` in each object inside `documents` array.
+All the documents are listed under the `documents` field. Each object inside `documents` array represents a record in the `Users` collection. .
 
 #### Update a record
 
@@ -900,12 +906,11 @@ We can update a specific record using Update Document function.
 ```js
 const updateUserDocument = async ({ documentID, name, email }) => {
   try {
-    return appwrite.database.updateDocument(
+    return database.updateDocument(
+      databaseID, //the database-id
       collectionID, //the collection-id
       documentID, //the document-id of the record that we are updating
-      { name, email }, //fields and data that needs to be updated in the record
-      ["*"], //read permissions (here we provide the "Wildcard " permission)
-      ["*"] //write permissions (here we provide the "Wildcard " permission)
+      { name, email } //fields and data that needs to be updated in the record
     );
   } catch (e) {
     console.error(e.message);
@@ -913,26 +918,32 @@ const updateUserDocument = async ({ documentID, name, email }) => {
 };
 ```
 
-In this `appwrite.database.updateDocument` function we have to provide five required parameters.
+In this `database.updateDocument` function we have to provide five required parameters.
 
-1. CollectionID
-2. DocumentID
-3. The data of the record to be updated (A JSON object containing all the record data to be updated)
-4. Read Permissions for this specific record. (Provided in an array)
-5. Write Permissions for this specific record. (Provided in an array)
+1. DatabaseID
+2. CollectionID
+3. DocumentID
+4. The data of the record to be updated (A JSON object containing all the record data to be updated)
 
-By providing new read and write permissions, we can update the permission for a specific record by providing its DocumentID. For more information, you can refer the [documentation](https://appwrite.io/docs/client/database?sdk=web#updateDocument).
+For more information, you can refer the [documentation](https://appwrite.io/docs/client/database?sdk=web#updateDocument).
 
 The response from Update Document function is as follows. It is similar to the response from Create Document function.
 
 ```json
 {
-  "$id": "5f6afdd185b8e",
-  "$permissions": { "read": ["*"], "write": ["*"] },
-  "$collection": "5f69c0a24b1cb",
-  "userID": "#123",
-  "name": "John Samuel",
-  "email": "jsamuel@gmail.com"
+  "userID": "433",
+  "name": "Rohjt",
+  "email": "omjicompaq6@gmail.com",
+  "$id": "6341c3f2b99f6303fae5",
+  "$createdAt": "2022-10-08T18:39:46.761+00:00",
+  "$updatedAt": "2022-10-08T18:46:24.538+00:00",
+  "$permissions": [
+    "read(\"user:6341c2092738b132eb80\")",
+    "update(\"user:6341c2092738b132eb80\")",
+    "delete(\"user:6341c2092738b132eb80\")"
+  ],
+  "$collectionId": "633ae0beae855eba99c9",
+  "$databaseId": "633ae03c9d2692732dbb"
 }
 ```
 
@@ -941,16 +952,16 @@ The response from Update Document function is as follows. It is similar to the r
 Finally, we have come to the end of the line. We can now delete a record. To do this let's implement Delete Document function.
 
 ```js
-const deleteUserDocument = async documentID => {
+const deleteUserDocument = async (documentID) => {
   try {
-    return appwrite.database.deleteDocument(collectionID, documentID);
+    return database.deleteDocument(databaseID, collectionID, documentID);
   } catch (e) {
     console.error(e.message);
   }
 };
 ```
 
-This function is also pretty straightforward. We only have to provide the `collectionID` and the `documentID`. For more information, you can refer the [documentation](https://appwrite.io/docs/client/database?sdk=web#deleteDocument).
+This function is also pretty straightforward. We only have to provide the`databaseID`, `collectionID` and the `documentID`. For more information, you can refer the [documentation](https://appwrite.io/docs/client/database?sdk=web#deleteDocument).
 
 The response from successful deletion of a record is only the `HTTP 204` message, and it does not provide any `JSON` response.
 

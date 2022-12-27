@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
+import { Storage } from 'appwrite';
 import PreviewImage from './PreviewImage';
+import {bucketID} from "../utils"
 
 export default function ListImage(props) {
   const [listImages, setListImages] = useState([]);
   const [active, setActive] = useState(null);
   async function getAllImages() {
-    const images = await props.appwrite.storage.listFiles();
+    const storage= new Storage(props.appwrite)
+    const images = await storage.listFiles(bucketID);
     const me = [...images.files];
-
+    console.log(me);
     setListImages(me);
   }
 
@@ -40,7 +43,7 @@ export default function ListImage(props) {
           ? listImages.map((a, index) => {
               // eslint-disable-next-line no-param-reassign
               a.color = active === index ? 'solid' : 'none';
-
+             
               return (
                 <Grid
                   container
