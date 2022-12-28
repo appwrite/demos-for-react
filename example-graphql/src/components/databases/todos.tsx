@@ -1,6 +1,6 @@
 import { Models } from "appwrite";
 import { useEffect, useRef, useState } from "react";
-import { createDocument, listDocuments } from "../../appwrite";
+import { createDocument, listDocuments, deleteDocument } from "../../appwrite";
 
 const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_ID;
@@ -57,9 +57,13 @@ export default function Databases() {
     });
   };
 
-  const deleteTodo = () => {};
+  const deleteTodo = async (id: string) => {
+    const doc = await deleteDocument(databaseId, collectionId, id);
+    //TODO: just delete this doc
+    listTodos();
+  };
 
-  const updateTodo = () => {};
+  // const updateTodo = () => {};
 
   return (
     <div
@@ -85,6 +89,7 @@ export default function Databases() {
             <tr>
               <th>Todo</th>
               <th>Done</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -94,6 +99,9 @@ export default function Databases() {
                   <tr key={c.$id}>
                     <th>{c?.todo}</th>
                     <th>{c?.done ? "Yes" : "No"}</th>
+                    <th>
+                      <button onClick={() => deleteTodo(c.$id)}>X</button>
+                    </th>
                   </tr>
                 );
               })}

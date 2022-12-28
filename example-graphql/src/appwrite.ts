@@ -384,8 +384,7 @@ export const updateDocument = async (
 export const deleteDocument = async (
   databaseId: string,
   collectionId: string,
-  documentId: string,
-  data: object
+  documentId: string
 ) => {
   return graphql
     .mutation({
