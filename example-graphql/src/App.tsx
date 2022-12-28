@@ -12,6 +12,8 @@ import Currencies from "./components/locale/currencies"
 import Languages from "./components/locale/languages"
 import All from "./components/locale/all"
 
+import Todos from "./components/databases/todos"
+
 function App() {
   return (
     <>
@@ -29,6 +31,7 @@ function App() {
             <Route path="/locale/all" element={<All />} />
           </Route>
         </Route>
+          <Route path="/databases" element={<Todos />} />
       </Routes>
     </>
   )

@@ -71,7 +71,7 @@ a:hover {
   filter: brightness(0.85);
   background-color: rgba(var(--appwrite-primary), 0.1);
 }
-
+ 
 .active {
   filter: brightness(0.85);
   background-color: rgba(var(--appwrite-primary), 0.1);

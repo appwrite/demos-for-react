@@ -7,48 +7,42 @@ export default function Phones() {
 
   const effectRan = useRef(false);
   useEffect(() => {
-    if(effectRan.current === false){ 
-        getCountriesPhones()
-        .then((i) => setInfo(i))
-      
+    if (effectRan.current === false) {
+      getCountriesPhones().then((i) => setInfo(i));
+
       return () => {
         effectRan.current = true;
-      }
+      };
     }
-  }, [])
-
+  }, []);
 
   return (
     <>
-          <h1>Phone Codes</h1>
+      <h1>Phone Codes</h1>
 
-    <div className="info">
+      <div className="info">
         <table>
-            <thead>
-                <tr>
-                    <th>Code</th>
-                    <th>Country Code</th>
-                    <th>Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                {info?.total && info.phones.map(c => {
-                    return(
-                        <tr key={c.code}>
-                            <th>
-                                {c?.code}
-                            </th>
-                            <th>
-                                {c?.countryCode}
-                            </th>
-                            <th>
-                                {c?.countryName}
-                            </th>
-                        </tr>
-                    )})}
-            </tbody>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Country Code</th>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {info?.total &&
+              info.phones.map((c) => {
+                return (
+                  <tr key={c.code}>
+                    <th>{c?.code}</th>
+                    <th>{c?.countryCode}</th>
+                    <th>{c?.countryName}</th>
+                  </tr>
+                );
+              })}
+          </tbody>
         </table>
-    </div>
+      </div>
     </>
-  )
+  );
 }

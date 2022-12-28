@@ -1,8 +1,8 @@
-import { Outlet, NavLink } from "react-router-dom"
+import { Outlet, NavLink } from "react-router-dom";
 
 export default function LocaleLayout() {
   return (
-    <section style={{width: '100%'}}>
+    <section style={{ width: "100%" }}>
       <nav className="locale-nav">
         <ul className="navigation-bar">
           <li>
@@ -29,9 +29,9 @@ export default function LocaleLayout() {
         </ul>
       </nav>
 
-      <section className="content" style={{position:'relative'}}>
+      <section className="content" style={{ position: "relative" }}>
         <Outlet />
       </section>
-    </section >
-  )
+    </section>
+  );
 }

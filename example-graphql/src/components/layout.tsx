@@ -12,6 +12,9 @@ export default function Layout() {
           <li>
             <NavLink to="/locale">Locale</NavLink>
           </li>
+          <li>
+            <NavLink to="/databases">Databases</NavLink>
+          </li>
         </ul>
       </nav>
 

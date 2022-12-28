@@ -1,4 +1,4 @@
-import packageJson from "../../package.json"
+import packageJson from "../../package.json";
 
 export default function Footer() {
   return (
@@ -9,5 +9,5 @@ export default function Footer() {
       </a>
       <p>on top of Appwrite SDK {packageJson.dependencies.appwrite}</p>
     </footer>
-  )
+  );
 }

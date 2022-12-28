@@ -7,44 +7,40 @@ export default function EUCountries() {
 
   const effectRan = useRef(false);
   useEffect(() => {
-    if(effectRan.current === false){ 
-      getEUCountries()
-        .then((i) => setInfo(i))
-      
+    if (effectRan.current === false) {
+      getEUCountries().then((i) => setInfo(i));
+
       return () => {
         effectRan.current = true;
-      }
+      };
     }
-  }, [])
-
+  }, []);
 
   return (
     <>
-          <h1>EU Countries List</h1>
+      <h1>EU Countries List</h1>
 
-    <div className="info">
+      <div className="info">
         <table>
-            <thead>
-                <tr>
-                    <th>Code</th>
-                    <th>Name</th>
-                </tr>
-            </thead>
-            <tbody>
-                {info?.total && info.countries.map(c => {
-                    return(
-                        <tr key={c.code}>
-                            <th>
-                                {c?.code}
-                            </th>
-                            <th>
-                                {c?.name}
-                            </th>
-                        </tr>
-                    )})}
-            </tbody>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {info?.total &&
+              info.countries.map((c) => {
+                return (
+                  <tr key={c.code}>
+                    <th>{c?.code}</th>
+                    <th>{c?.name}</th>
+                  </tr>
+                );
+              })}
+          </tbody>
         </table>
-    </div>
+      </div>
     </>
-  )
+  );
 }
