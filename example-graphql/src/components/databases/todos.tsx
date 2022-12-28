@@ -1,6 +1,6 @@
 import { Models } from "appwrite";
 import { useEffect, useRef, useState } from "react";
-import { listDocuments } from "../../appwrite";
+import { createDocument, listDocuments } from "../../appwrite";
 
 const databaseId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
 const collectionId = import.meta.env.VITE_APPWRITE_COLLECTION_ID;
@@ -15,32 +15,70 @@ export default function Databases() {
     { total?: number; todos?: Todo[] } | undefined
   >();
 
+  const [todo, setTodo] = useState<string>("");
+
   const effectRan = useRef(false);
   useEffect(() => {
     if (effectRan.current === false) {
-      listDocuments(databaseId, collectionId).then((i) => {
-        setInfo({
-          total: i?.data?.databasesListDocuments?.total,
-          todos: i?.data?.databasesListDocuments?.documents.map((d) =>
-            JSON.parse(d.data)
-          ),
-        });
-      });
+      listTodos();
 
       return () => {
         effectRan.current = true;
       };
     }
   }, []);
-  const createTodo = () => {};
+
+  const listTodos = () => {
+    listDocuments(databaseId, collectionId).then((i) => {
+      setInfo({
+        total: i?.data?.databasesListDocuments?.total,
+        todos: i?.data?.databasesListDocuments?.documents.map((d) =>
+          JSON.parse(d.data)
+        ),
+      });
+    });
+  };
+  const createTodo = async () => {
+    const doc = await createDocument(databaseId, collectionId, {
+      todo,
+    });
+    setTodo("");
+    const parsed =
+      doc?.data?.databasesCreateDocument?.data &&
+      JSON.parse(doc?.data?.databasesCreateDocument?.data);
+    const parsedTodo: Todo = {
+      $id: doc?.data?.databasesCreateDocument._id,
+      ...parsed,
+    };
+    console.log(parsedTodo);
+    setInfo({
+      total: (info?.total || 0) + 1,
+      todos: info?.todos ? [...info.todos, ...[parsedTodo]] : [parsedTodo],
+    });
+  };
 
   const deleteTodo = () => {};
 
   const updateTodo = () => {};
 
   return (
-    <>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "1em",
+      }}
+    >
       <h1>Todos</h1>
+      <div style={{ display: "flex" }}>
+        <input
+          value={todo}
+          type="text"
+          onChange={(e) => setTodo(e.target.value)}
+        />
+        <button onClick={() => createTodo()}>Add</button>
+      </div>
       <div className="info">
         <table>
           <thead>
@@ -62,6 +100,6 @@ export default function Databases() {
           </tbody>
         </table>
       </div>
-    </>
+    </div>
   );
 }

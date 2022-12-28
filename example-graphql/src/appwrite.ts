@@ -256,10 +256,10 @@ export const createDocument = async (
   collectionId: string,
   data: object
 ) => {
-  graphql
+  return graphql
     .mutation({
-      query: `mutation CreateDocument ($databaseId: String!, $collectionId: String!, $documentId: String!, $data: JSON) {
-          databasesCreateDocument(databaseId: $databaseId, collectionId: $collectionId, documentId: $documentId, data: $data) { _id }
+      query: `mutation CreateDocument ($databaseId: String!, $collectionId: String!, $documentId: String!, $data: Json!) {
+          databasesCreateDocument(databaseId: $databaseId, collectionId: $collectionId, documentId: $documentId, data: $data) { _id data }
       }`,
       variables: {
         databaseId,
@@ -276,7 +276,9 @@ export const createDocument = async (
         return;
       }
 
-      return response;
+      return response as {
+        data: { databasesCreateDocument: { _id: string; data: string } };
+      };
     });
 };
 
