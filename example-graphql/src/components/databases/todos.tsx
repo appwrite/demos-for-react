@@ -32,9 +32,12 @@ export default function Databases() {
     listDocuments(databaseId, collectionId).then((i) => {
       setInfo({
         total: i?.data?.databasesListDocuments?.total,
-        todos: i?.data?.databasesListDocuments?.documents.map((d) =>
-          JSON.parse(d.data)
-        ),
+        todos: i?.data?.databasesListDocuments?.documents.map((d) => {
+          return {
+            $id: d._id,
+            ...JSON.parse(d.data),
+          };
+        }),
       });
     });
   };
@@ -50,7 +53,6 @@ export default function Databases() {
       $id: doc?.data?.databasesCreateDocument._id,
       ...parsed,
     };
-    console.log(parsedTodo);
     setInfo({
       total: (info?.total || 0) + 1,
       todos: info?.todos ? [...info.todos, ...[parsedTodo]] : [parsedTodo],
@@ -93,7 +95,7 @@ export default function Databases() {
             </tr>
           </thead>
           <tbody>
-            {info?.total &&
+            {info?.total ? (
               info?.todos?.map((c) => {
                 return (
                   <tr key={c.$id}>
@@ -104,7 +106,10 @@ export default function Databases() {
                     </th>
                   </tr>
                 );
-              })}
+              })
+            ) : (
+              <tr></tr>
+            )}
           </tbody>
         </table>
       </div>

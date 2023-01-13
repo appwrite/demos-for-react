@@ -256,30 +256,27 @@ export const createDocument = async (
   collectionId: string,
   data: object
 ) => {
-  return graphql
-    .mutation({
-      query: `mutation CreateDocument ($databaseId: String!, $collectionId: String!, $documentId: String!, $data: Json!) {
+  const response = await graphql.mutation({
+    query: `mutation CreateDocument ($databaseId: String!, $collectionId: String!, $documentId: String!, $data: Json!) {
           databasesCreateDocument(databaseId: $databaseId, collectionId: $collectionId, documentId: $documentId, data: $data) { _id data }
       }`,
-      variables: {
-        databaseId,
-        collectionId,
-        documentId: ID.unique(),
-        data,
-      },
-    })
-    .then(function (response: any) {
-      console.log(response);
+    variables: {
+      databaseId,
+      collectionId,
+      documentId: ID.unique(),
+      data,
+    },
+  });
+  console.log(response);
 
-      if ("errors" in response) {
-        alert("Failed to create document!");
-        return;
-      }
+  if ("errors" in response) {
+    alert("Failed to create document!");
+    return;
+  }
 
-      return response as {
-        data: { databasesCreateDocument: { _id: string; data: string } };
-      };
-    });
+  return response as {
+    data: { databasesCreateDocument: { _id: string; data: string } };
+  };
 };
 
 export const getDocument = async (
@@ -287,9 +284,8 @@ export const getDocument = async (
   collectionId: string,
   documentId: string
 ) => {
-  graphql
-    .query({
-      query: `query GetDocument ($databaseId: String!, $collectionId: String!, $documentId: String!) {
+  const response = await graphql.query({
+    query: `query GetDocument ($databaseId: String!, $collectionId: String!, $documentId: String!) {
           databasesGetDocument(databaseId: $databaseId, collectionId: $collectionId, documentId: $documentId) {
               _id
               _createdAt
@@ -299,22 +295,20 @@ export const getDocument = async (
               size
           }
       }`,
-      variables: {
-        databaseId,
-        collectionId,
-        documentId,
-      },
-    })
-    .then(function (response) {
-      console.log(response);
+    variables: {
+      databaseId,
+      collectionId,
+      documentId,
+    },
+  });
+  console.log(response);
 
-      if ("errors" in response) {
-        alert("Failed to get document!");
-        return;
-      }
+  if ("errors" in response) {
+    alert("Failed to get document!");
+    return;
+  }
 
-      return response;
-    });
+  return response;
 };
 
 export const listDocuments = async (
@@ -322,33 +316,30 @@ export const listDocuments = async (
   collectionId: string,
   fields?: string
 ) => {
-  return graphql
-    .query({
-      query: `query ListDocuments ($databaseId: String!, $collectionId: String!) {
-          databasesListDocuments(databaseId: $databaseId, collectionId: $collectionId) { total documents { data } }
+  const response = await graphql.query({
+    query: `query ListDocuments ($databaseId: String!, $collectionId: String!) {
+          databasesListDocuments(databaseId: $databaseId, collectionId: $collectionId) { total documents { _id data } }
       }`,
-      variables: {
-        databaseId,
-        collectionId,
-      },
-    })
-    .then(function (response) {
-      console.log(response);
+    variables: {
+      databaseId,
+      collectionId,
+    },
+  });
+  console.log(response);
 
-      if ("errors" in response) {
-        alert("Failed to list documents!");
-        return;
-      }
+  if ("errors" in response) {
+    alert("Failed to list documents!");
+    return;
+  }
 
-      return response as {
-        data: {
-          databasesListDocuments: {
-            total: number;
-            documents: [{ data: string }];
-          };
-        };
+  return response as {
+    data: {
+      databasesListDocuments: {
+        total: number;
+        documents: [{ _id: string; data: string }];
       };
-    });
+    };
+  };
 };
 
 export const updateDocument = async (
@@ -357,28 +348,25 @@ export const updateDocument = async (
   documentId: string,
   data: object
 ) => {
-  return graphql
-    .query({
-      query: `mutation UpdateDocument ($databaseId: String!, $collectionId: String!, $documentId: String!, $data: JSON) {
+  const response = await graphql.query({
+    query: `mutation UpdateDocument ($databaseId: String!, $collectionId: String!, $documentId: String!, $data: JSON) {
           databasesUpdateDocument(databaseId: $databaseId, collectionId: $collectionId, documentId: $documentId, data: $data) { _id }
       }`,
-      variables: {
-        databaseId,
-        collectionId,
-        documentId,
-        data,
-      },
-    })
-    .then(function (response) {
-      console.log(response);
+    variables: {
+      databaseId,
+      collectionId,
+      documentId,
+      data,
+    },
+  });
+  console.log(response);
 
-      if ("errors" in response) {
-        alert("Failed to update document!");
-        return;
-      }
+  if ("errors" in response) {
+    alert("Failed to update document!");
+    return;
+  }
 
-      return response;
-    });
+  return response;
 };
 
 export const deleteDocument = async (
@@ -386,25 +374,22 @@ export const deleteDocument = async (
   collectionId: string,
   documentId: string
 ) => {
-  return graphql
-    .mutation({
-      query: `mutation DeleteDocument ($databaseId: String!, $collectionId: String!, $documentId: String!) {
+  const response = await graphql.mutation({
+    query: `mutation DeleteDocument ($databaseId: String!, $collectionId: String!, $documentId: String!) {
           databasesDeleteDocument(databaseId: $databaseId, collectionId: $collectionId, documentId: $documentId) { status }
       }`,
-      variables: {
-        databaseId,
-        collectionId,
-        documentId,
-      },
-    })
-    .then(function (response) {
-      console.log(response);
+    variables: {
+      databaseId,
+      collectionId,
+      documentId,
+    },
+  });
+  console.log(response);
 
-      if ("errors" in response) {
-        alert("Failed to delete document!");
-        return;
-      }
+  if ("errors" in response) {
+    alert("Failed to delete document!");
+    return;
+  }
 
-      return response;
-    });
+  return response;
 };
