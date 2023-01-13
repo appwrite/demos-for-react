@@ -337,8 +337,6 @@ Our home page is only accessible by authenticated users, as you can see in our `
 
 ```tsx
 import { Outlet, Link } from "react-router-dom"
-import appwriteLogo from "../../public/appwrite.svg"
-import Footer from "./footer"
 
 export default function Layout() {
   return (

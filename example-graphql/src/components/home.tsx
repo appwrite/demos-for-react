@@ -1,4 +1,4 @@
-import appwriteLogo from "../../public/appwrite.svg";
+import appwriteLogo from "../images/appwrite.svg";
 
 export default function Home() {
   return (
