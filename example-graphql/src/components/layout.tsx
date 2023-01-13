@@ -1,9 +1,8 @@
-import { Outlet, NavLink } from "react-router-dom"
-import Footer from "./footer"
+import { Outlet, NavLink } from "react-router-dom";
 
 export default function Layout() {
   return (
-    <main style={{display:'flex', height: '100vh', flexDirection: 'column'}}>
+    <main style={{ display: "flex", height: "100vh", flexDirection: "column" }}>
       <nav>
         <ul className="navigation-bar">
           <li>
@@ -21,8 +20,6 @@ export default function Layout() {
       <section className="content">
         <Outlet />
       </section>
-
-      <Footer />
-    </main >
-  )
+    </main>
+  );
 }
