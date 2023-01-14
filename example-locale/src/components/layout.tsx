@@ -1,6 +1,5 @@
-import { Outlet, Link } from "react-router-dom"
-import appwriteLogo from "../../public/appwrite.svg"
-import Footer from "./footer"
+import { Outlet, Link } from "react-router-dom";
+import appwriteLogo from "../../public/appwrite.svg";
 
 export default function Layout() {
   return (
@@ -38,8 +37,6 @@ export default function Layout() {
       <section className="content">
         <Outlet />
       </section>
-
-      <Footer />
-    </main >
-  )
+    </main>
+  );
 }
