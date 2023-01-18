@@ -1,6 +1,5 @@
 import { Outlet, Link } from "react-router-dom"
 import appwriteLogo from "../assets/appwrite.svg"
-import Footer from "./footer"
 
 export default function Layout() {
   return (
@@ -26,8 +25,6 @@ export default function Layout() {
       <section className="content">
         <Outlet />
       </section>
-
-      <Footer />
     </main >
   )
 }
