@@ -3,440 +3,499 @@ This example is to showcase [Appwrite's JS API](https://github.com/appwrite/sdk-
 
 ## Prerequisites
 
--   A Recent Version of NodeJS
--   Yarn (Feel free to use NPM if you want to, just switch out the Yarn Commands for their NPM counterparts)
--   [A locally running appwrite instance](https://appwrite.io/docs/installation).
+- A recent version of NodeJS
+- Yarn (feel free to use NPM if you want to, just switch out the yarn commands for their NPM counterparts)
+- [A locally running appwrite instance](https://appwrite.io/docs/installation).
+
 ## Getting Started
-To get started quickly we will use [Create React App](https://github.com/facebook/create-react-app) to create the boilerplate that our code will be built on.
+To get started quickly we will use [Vite](https://vitejs.dev/) to create the boilerplate that our code will be built on.
+
 ```shell
-npx create-react-app appwrite-react
+yarn create vite
 cd appwrite-react
 ```
+And then follow the creation process, in our case we're going to use the `react-typescript` template.
+
 While we are in the CLI we will also install the Appwrite JS API by running:
 ```shell
 yarn add appwrite
 ```
 and finally we will launch the React development server with:
 ```shell
-yarn start
+yarn dev
 ```
-This should launch a server on `localhost:3000` with Live Reload.
+This should launch a server on `localhost:5173` with Live Reload.
 
 ## Introducing the Appwrite SDK
-With the boilerplate now complete we can now initialise the Appwrite SDK in the project before working on the login page. To keep things clean we will initialise this in it's own file, we will create this file in `src/` and call it `utils.js`. Within this file go ahead and paste the following code:
-```js
-import {Client} from "appwrite"  // Import the appwrite library
+With the boilerplate now complete we can now initialise the Appwrite SDK in the project before working on the login page. To keep things clean we will initialise this in it's own file, we will create this file in `src/` and call it `appwrite.ts`. Within this file go ahead and paste the following code:
 
-const client = new Client();
- 
-client
-  .setEndpoint('http://localhost:8000/v1') // We set the endpoint, change this if your using another endpoint URL.
-  .setProject('632354c21d497895d2dd'); // Here replace 'ProjectID' with the project ID that you created in your appwrite installation.
+```ts
+import { Client } from "appwrite"
 
-export { client}; // Finally export the client object to be used in projects.
-
+const client = new Client()
+  .setEndpoint(import.meta.env.VITE_APPWRITE_URL)
+  .setProject(import.meta.env.VITE_APPWRITE_PROJECT);
 ```
-A deeper inspection of this code can be found in the comments within it, 
 
-TL:DR: Create a appwrite SDK Instance and initalise it with the endpoint and ProjectID of the project we are working with then export this for usage outside of the file.
+In this codeblock we are using Vite's approach for environment variables. To do this, we're going to create a `.env` file at the root of our project and then populate it with the following information:
 
-## Creating the App.js
-We are now going to replace the `src/App.js` with our own, doing so we will turn the object from a function react component to a class based one aswell as adding a bunch of logic to the app which will be used later by components.
+NOTE: You can find an example file in this repository as `.env.template`
 
-```js
-import React from 'react';
-import {Account,ID} from "appwrite"
-import { client } from './utils';
-import './App.css';
-import { Login } from './components/Login';
-import { Profile } from './components/Profile';
-
-const account = new Account(client);
-
-class App extends React.Component {
-  constructor (props) {
-    super(props);
-    this.state = { // Create the variables we will use later.
-      userprofile: false,
-      error: false,
-      currentPage: false,
-    };
-  };
-
-  // Get userdata function.
-  async getUserdata () {
-    try {
-      const response = await account.get(); // Request to appwrite server to see if we are logged in.
-      this.setState({ userprofile: response }); // If Logged in then set the returned profile to the userprofile variable in state.
-    } catch (err) { // If we are not logged in or another error occoured then catch(err)
-      if (err.toString() === 'Error: Unauthorized') return; // If not logged in then do nothing.
-      this.setState({ error: err.toString() }); // If it's another error then set the error variable in state.
-      console.error(err); // and also console.error the error for clearer debugging.
-    }
-  }
-
-  // Login function
-  async login (email, password) {
-    try {
-      // Set error to false so if we are successful the error doesn't perist making bad UX Design.
-      // also set the loading prop to true to signal to the user we are processing his request.
-      await this.setState({ error: false })
-
-      // Create the session, if this fails it will error and be caught by the catch(err).
-      await account.createEmailSession(
-        email,
-        password
-      );
-      // If all is successful then get the userdata.
-      this.getUserdata();
-    } catch (err) {
-      await this.setState({ error: 'Invalid Credentials' }) // If login fails then show user the login was not successful.
-      console.error(err) // also console error for debugging purposes.
-    }
-  }
-
-  async register(email, password){
-    try {
-      // Set error to false so if we are successful the error doesn't perist making bad UX Design.
-      // also set the loading prop to true to signal to the user we are processing his request.
-      await this.setState({ error: false })
-
-      // Create the account, if this fails it will error and be caught by the catch(err).
-      if(email.length===0){
-        return
-      }
-      await account.create(
-        ID.unique(),
-        email,
-        password
-      );
-
-      await this.setState({ error: 'Register Successful'});
-    }  catch (err) {
-      await this.setState({ error: 'Invalid Credentials' }) // If registration fails then show user the registration was not successful.
-      console.error(err) // also console error for debugging purposes.
-    }
-  }
-
-  // Logout the user function.
-  async logout () {
-    await this.setState({ userprofile: false }); // Remove the local copy of the userprofile causing the app to see that the user is not logged in.
-    account.deleteSession('current'); // Tell appwrite server to remove current session and complete the logout.
-  }
-
-  componentDidMount () {
-
-    this.getUserdata(); // On page load check if we are already logged in.
-  }
-
-  render () {
-    return (
-      <div>
-        <div className='loginCore'>
-          {!this.state.userprofile && (
-            <div className='loginPage'>
-              <Login currentPage={this.state.currentPage} registerFunc={(email, password) => this.register(email, password)} loginFunc={(email, password) => this.login(email, password)} error={() => this.state.error} />
-              <div className='loginSwitchContainer'>
-                <p>{this.state.currentPage ? 'Got an account?' : "Haven't got an account?"}</p>
-                <span onClick={() => this.setState({ currentPage: !this.state.currentPage })}>{this.state.currentPage ? 'Login' : 'Sign Up'}</span>
-              </div>
-            </div>
-          )}
-          {this.state.userprofile && (
-            <div className='loginPage'>
-              <Profile userprofile={this.state.userprofile} logout={() => this.logout()} />
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  }
-};
-
-export default App;
+```env
+VITE_APPWRITE_URL=<YOUR_API_ENDPOINT>
+VITE_APPWRITE_PROJECT=<YOUR_PROJECT_ID>
 ```
-Now this is alot to take in we will attempt to break this down and explain what all this code does.
 
-First we create a new class based off React.Component which allows us to create our custom App component we also go ahead and import the earlier created appwrite object from `utils.js`.
+Now, you can export the initialized client or keep the Appwrite functions in this file.
 
-in `constructor(props)` we use `super(props)` to call the parents constructor, in this tutorial you do not have to know exactly what `super()` is used for, all you need to know is that it allows us to use `this`. 
+## Creating the App.tsx
+We are now going to replace the `src/App.tsx` with our own. For this example, we're going to use [react-router](https://reactrouter.com/en/main) to develop our SPA.
 
-Next we will create `this.state` in react this is how we store data in components and rerender when things get changed with `this.setState()`
+First of all, install `react-router`
 
-We now create a couple functions which allow us to interact with the appwrite instance using the SDK, I'll explain them now.
+```shell
+yarn add react-router-dom@latest
+```
 
-### `getUserdata()` 
-1. The function will contact the appwrite instance and check if we are logged in.
-2. If we are logged in then we will set the `userprofile` variable in state to tell the rest of the app that we are logged in.
-3. If we are not logged in then it will simply return,
-First we function we create will check if we are logged in and if so sets the `userprofile` variable in state to it Iit will also null all the input variables as a security precaution). If we are not logged in it will simply return. If another error is encountered it will set the error variable in state to show the user the error and log the error in console.
+Then, in our `main.tsx` file:
 
-### `login()`
+```tsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import "./index.css"
+import { BrowserRouter } from "react-router-dom"
 
-1. Check that a previous request is not being processed by checking the loading variable in state. If it is then a new request isn't started.
-2. Sets the error variable in state to false and the loading variable to true to prevent new request from being created during this request.
-3. Then the funciton will attempt to create a new session with the credentials provided by the user. If this is successful then `getUserdata()` is called and it will get the profile and tell the rest of the app that the user is logged in.
-4. If the login function fails then it will throw a `Invalid Credentials` error and let the user know that their credentials we're invalid.
+ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
+  </React.StrictMode>
+)
+```
 
-### logout()
-Thankfully this function is pretty simple. It will set the `userprofile` state variable to false then tell appwrite to invalidate the session it was holding to complete the logout.
+Great! Now we have a functional router for our SPA.
 
-With that all appwrite related functions are finished and we can continue to the components.
+Back to our `App.tsx` file...
 
-## Creating the login and profile components
-At the moment we have all the logic to create our login page but we don't yet have the actual forms at the moment it just says `Hello World!` and you can't login with that! So now we will create two new components. First we will create the login one.
+```tsx
+import { Routes, Route } from "react-router-dom"
+import Layout from './components/layout'
+import SignUp from './components/signup'
+import LogIn from './components/login'
+import Home from "./components/home"
 
-### Creating the Login Component
-Go ahead and create a folder as `src/components/` this is where we will store the components we will be creating. Now in `src/components/` create a new file called `Login.jsx`(The .jsx is not a typo, it's a extension type for JSX Files used in React. [See more here](https://reactjs.org/docs/introducing-jsx.html))
+function App() {
+  return (
+    <>
+      <Routes>
+        <Route path='/' element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path='/login' element={<LogIn />} />
+          <Route path='/signup' element={<SignUp />} />
+        </Route>
+      </Routes>
+    </>
+  )
+}
 
-```JSX
-import React from 'react';
+export default App
+```
 
-class Login extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            email: '',
-            password: '',
-            loading: false
-        };
-    };
+In this file we're going to just define the routes we want to use. We'll explain them later. But before that, let's write the functions that connect our site with Appwrite.
 
-    async processLogin(event) {
-        event.preventDefault() // Prevent default to prevent reloading of page.
+## Creating the server functions
 
-        if (this.state.loading) return; // If loading then return.
+From this point you can create a separate file or just stay in the `appwrite.ts` file we created before.
 
-        await this.setState({
-            error: false,
-            loading: true
-        }); // Start new request by removing any previous errors and setting loading to true
+So, let's create our functions.
 
-        // Validation
-        if (!(this.state.password.length >= 6 && this.state.password.length <= 32)) {
-            // If validation incorrect then set error and then set loading to false
-            this.setState({
-                error: 'Error: Password must be between 6 and 32 characters.',
-                loading: false
-            });
-            return;
-        }
+### getUserData
 
-        await this.props.loginFunc(this.state.email, this.state.password); // Request login
+```ts
+export const getUserData = async () => {
+  try {
+    const account = new Account(client)
+    return account.get()
+  } catch (error) {
+    const appwriteError = error as AppwriteException;
+    throw new Error(appwriteError.message)
+  }
+}
+```
 
-        // If success then set loading to false
-        await this.setState({
-            loading: false
-        });
+This function will get the current user's preferences, but, if there's an error, will throw it as an `AppwriteException`.
+
+### login
+
+```ts
+export const login = async (email: string, password: string) => {
+  try {
+    const account = new Account(client)
+    return account.createEmailSession(email, password)
+  } catch (error) {
+    const appwriteError = error as AppwriteException;
+    throw new Error(appwriteError.message)
+  }
+}
+```
+
+This function will create a session from the email and password we pass to it, if they get a match in the database. If not, throws an `AppwriteException`.
+
+### logout
+
+```ts
+export const logout = async () => {
+  try {
+    const account = new Account(client)
+    return account.deleteSession('current')
+  } catch (error: unknown) {
+    const appwriteError = error as AppwriteException;
+    throw new Error(appwriteError.message)
+  }
+}
+```
+
+This function will logout the user deleting the current session, throwing an `AppwriteException` if there's an error.
+
+### register
+
+```ts
+export const register = async (email: string, password: string) => {
+  try {
+    const account = new Account(client)
+    return account.create('unique()', email, password)
+  } catch (error) {
+    const appwriteError = error as AppwriteException;
+    throw new Error(appwriteError.message)
+  }
+}
+```
+
+This function will create a new user from their email and password. Note the `'unique()'` parameter, as it's explained in Appwrite docs, if we aren't using a custom ID generating solution, using this key phrase will tell Appwrite to generate a random one.
+
+And that's all!, you can tell that all of our functions are asynchronous, and that's because we don't want to block the main execution thread while asking the server something and freeze all the site.
+
+
+## Creating the pages
+Now we're ready to do some React stuff. Let's get there.
+
+### Log in page
+
+In our `src/components` folder, we create a new `login.tsx` file and write the following code:
+
+```tsx
+import { FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom"
+import { login } from "../appwrite";
+
+export default function LogIn() {
+  const [email, setEmail] = useState<string>();
+  const [password, setPassword] = useState<string>();
+  const navigate = useNavigate()
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!email) {
+      alert('Email is required.')
+      return;
     }
 
-    render() {
-        const error = this.state.error || this.props.error()
-        return (
-            <div>
-        <h1>Login</h1>
-        {error && (
-          <p className='error'>{error}</p>
-        )}
-        <form onSubmit={(e) => this.processLogin(e)}>
-          <input onChange={(event) => this.setState({ email: event.target.value })} type='email' id='email' required placeholder='Email' />
-          <input onChange={(event) => this.setState({ password: event.target.value })} type='password' id='password' required placeholder='Password' />
-          <button disabled={this.state.loading} type='submit'>Sign In</button>
-        </form>
-      </div>
-        )
+    if (!password) {
+      alert('Password is required.')
+      return;
     }
-};
 
-export {
-    Login
-};
+    login(email, password)
+      .then((account) => alert(`Successfully logged in from: ${account.osName}`))
+      .finally(() => navigate('/'))
+  }
+
+  return (
+    <form className="form" onSubmit={handleSubmit}>
+      <label htmlFor="email">
+        Email
+      </label>
+      <input
+        id="email"
+        type="email"
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
+      <label htmlFor="password">
+        Password
+      </label>
+      <input
+        id="password"
+        type="password"
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      <button type="submit">Log In</button>
+    </form>
+  )
+}
 ```
-Now, lets explain this code. First we do create a new class from based off React.Component like last time and create a constructor with `super(props)` and a `this.state` with the variables we will use.
 
-Now we create a function called `processLogin(event)` all this does is:
-1. Calls event.preventDefault() to prevent a page refresh
-2. Set's error and loading to false in state
-3. Performs validation and if anything fails sets the Error variable in state then returns
-4. Runs `this.props.loginFunc`. Now this is different `this.props` is actually a way of us passing data and functions from parents to the children component, and here we pass a prop called `loginFunc` which will run the `login()` function from `src/App.js`. We'll explain this more when we start patching things together in App.js
-5. Once everything is done set loading to false in state and if everything is successful then `src/App.js` will switch the component being rendered to the Profile component that we will create next.
+Here, we create a basic HTML form that handles two values in React's state: `email` and `password`. Once the user clicks the submit button, if the credentials are correct, runs the `login()` function and redirects the user to the home page.
 
-Now, the render function uses JSX and all the render function does is create a form with some styling and has `onSubmit` to trigger the `processLogin()` function aswell as `onChange` to change the variables in state whenever the input changes, We also will disable the Sign In button if `this.state.loading` is to show the user that the request is being processed.
+### Sign up page
 
-### Creating the Profile Component
-Next we will create a new component for the Profile render, make a new file in the `src/components` directory and call it `Profile.jsx` then copy the following code:
-```JSX
-import React from 'react';
+In our `src/components` folder, we'll create `signup.tsx`, and write the following code.
 
-class Profile extends React.Component {
-    render() {
-        return (
-            <div>
-	        <h2>Logged In!</h2>
-	        <h1>{this.props.userprofile.name}</h1>
-	        <p>{this.props.userprofile.email}</p>
-	        <p>ID: {this.props.userprofile.$id}</p>
-	        <button onClick={() => this.props.logout()}>Logout</button>
-	    </div>
-        )
+```tsx
+import { FormEvent, useState } from "react";
+import { register } from "../appwrite";
+
+export default function SignUp() {
+  const [email, setEmail] = useState<string>();
+  const [password, setPassword] = useState<string>();
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!email) {
+      alert('Email is required.')
+      return;
     }
-};
 
-export { Profile };
+    if (!password) {
+      alert('Password is required.')
+      return;
+    }
+
+    if (password.length < 8) {
+      alert('Password must be at least 8 characters long.')
+      return;
+    }
+
+    register(email, password).then((account) => alert(`Successfully created account with ID: ${account.$id}`))
+  }
+
+  return (
+    <form className="form" onSubmit={handleSubmit}>
+      <label htmlFor="email">
+        Email
+      </label>
+      <input
+        id="email"
+        type="email"
+        onChange={(e) => setEmail(e.target.value)}
+      />
+
+      <label htmlFor="password">
+        Password
+      </label>
+      <input
+        id="password"
+        type="password"
+        onChange={(e) => setPassword(e.target.value)}
+      />
+
+      <button type="submit">Sign up</button>
+    </form>
+  )
+}
 ```
-Notice how this code is significantly simpler than the others and that it doesn't have a `constructor()` this is because we don't need to add a state as we are not processing data with this component. All it does it render the data sent from the `userprofile` prop and offers a button that will call `this.props.logout()` when clicked.
 
-With that all our custom components are finished!
+As you can notice, it's pretty similar to our `login.tsx`. In fact, the only notorious changes are: a new conditional checking password length, and the function that we use, in this case `register()`.
 
-## Combining it all together
-With all the components finished all we need to do now is add them into our main `App.js` and create the JSX to render it.
+If you want, you can create a custom form component to avoid repeating code.
 
-First we want to import our shiny new components, in `src/App.js` go ahead and place the following under `import { appwrite } from './utils` near the top:
-```JS
-import  './App.css';
+### Home page
 
-import { Login } from './components/Login';
-import { Profile } from './components/Profile';
-```
-This will import the components we need aswell as add the styling from `app.css` that we removed earlier.
+```tsx
+import { Models } from "appwrite";
+import { useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react";
+import { getUserData, logout } from "../appwrite";
 
-Next we change the `render()` function to render some JSX that will render our custom components.
-Go ahead and find:
-```js
-render() {
+export default function Home() {
+  const navigate = useNavigate()
+  const [user, setUser] = useState<Models.Account<Models.Preferences>>()
+
+  useEffect(() => {
+    getUserData()
+      .then((account) => setUser(account))
+      .catch((error) => navigate('/login'))
+  }, [])
+
+  const handleLogOut = () => logout().then(() => navigate('/login'))
+
+  if (!user) return <p>You aren't logged in.</p>
+
   return (
     <div>
-      Hello World!
+      <p>Logged in as {user.email}</p>
+      <button onClick={handleLogOut}>Log out</button>
     </div>
   )
 }
 ```
-and replace it with:
-```js
-render() {
-    return (
-        <div>
-        <div className='loginCore'>
-          {!this.state.userprofile && (
-            <div className='loginPage'>
-              <Login loginFunc={(email, password) => this.login(email, password)} error={() => this.state.error} />
-              <div className='loginSwitchContainer'>
-                <p>{this.state.currentPage ? 'Got an account?' : "Haven't got an account?"}</p>
-                <span onClick={() => this.setState({ currentPage: !this.state.currentPage })}>{this.state.currentPage ? 'Login' : 'Sign Up'}</span>
-              </div>
-            </div>
-          )}
-          {this.state.userprofile && (
-            <div className='loginPage'>
-              <Profile userprofile={this.state.userprofile} logout={() => this.logout()} />
-            </div>
-          )}
-        </div>
+
+Our home page is only accessible by authenticated users, as you can see in our `useEffect` hook, if we catch an error getting the current user's data, it will redirect the user to the login page. If the user is authenticated, then we show them their name (just as an example) and show them a log out button that closes their session.
+
+### Layout
+
+```tsx
+import { Outlet, Link } from "react-router-dom"
+import appwriteLogo from "../../public/appwrite.svg"
+import Footer from "./footer"
+
+export default function Layout() {
+  return (
+    <main>
+      <nav>
+        <ul className="navigation-bar">
+          <li>
+            <Link to="/">Home</Link>
+          </li>
+          <li>
+            <Link to="/login">Log In</Link>
+          </li>
+          <li>
+            <Link to="/signup">Sign Up</Link>
+          </li>
+        </ul>
+      </nav>
+
+      <div className="appwrite-logo">
+        <img src={appwriteLogo} alt="Appwrite's logo" />
       </div>
-    )
+
+      <section className="content">
+        <Outlet />
+      </section>
+
+      <Footer />
+    </main >
+  )
 }
 ```
-Now finally we will explain this JSX, `{!this.state.userprofile && (<div></div>)}` might get you scratching your head, but this is actually one of the features of JSX. It allows us to create if statements within our HTML so for instance this statement is essentially saying if not `this.state.userprofile` then render everything within the circle brackets and we also use brackets to use JS variables within text and to add the functions the components need as props.
 
-## Adding some style 😎
-Now, this is all cool but it doesn't look good. You could either style it yourself if your up for the challenge or edit `src/App.css` to add the following CSS I have created:
+This is not really a page but a template of how our pages are displayed. We created a navigation bar with the links to our desired pages, added the Appwrite's logo, our `Outlet` component (where `react-router` will display the page's content) and a footer, with some information.
+
+And that's it! You now have a functional SPA to authenticate your users and allow them to create their accounts.
+
+
+## Adding some style
+Now, this is all cool but it doesn't look good. You can use whatever CSS solution you want, like Tailwind, vanilla-extract, Stitches, Chakra, etc. For this example, I just used some of the Vite's defaults and added some classes:
+
 ```css
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+  color: #FFF;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  --dark-gray: #242424;
+  --appwrite-primary: #f02e65
+}
+
 html {
-  background: linear-gradient(90deg, rgba(209, 0, 176, 1) 0%, rgba(0, 249, 255, 1) 100%);
-  color: #333;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  background-color: var(--dark-gray);
 }
 
-html,
-body,
-#root {
-  width: 100%;
-  height: 100%;
+body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 90vh;
 }
 
-input,
-button,
-select,
-textarea {
+button {
+  border-radius: 8px;
+  color: #fff;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
   font-family: inherit;
-  font-size: inherit;
-  -webkit-padding: 0.4em 0;
-  padding: 0.4em;
-  margin: 0 0 0.5em 0;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 2px;
-}
-
-.loginPage input {
-  display: block;
-  margin: 0 auto;
-  margin-bottom: 20px;
-}
-
-.loginCore {
-  position: absolute;
-  width: 300px;
-  background-color: white;
-  border-radius: 10px;
-  top: 50%;
-  left: 50%;
-  transform: translateX(-50%) translateY(-50%);
-  text-align: center;
-}
-
-.loginCore span {
-  color: rgb(0, 162, 255);
-}
-
-.loginCore span:hover {
+  background-color: #1a1a1a;
   cursor: pointer;
+  transition: border-color 0.25s;
 }
 
-.loginPage input {
-  display: block;
-  margin: 0 auto;
-  margin-bottom: 20px;
+button:hover {
+  border-color: var(--appwrite-primary);
 }
 
-.loggedIn {
-  padding-top: 30px;
-  padding-bottom: 30px;
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
 }
 
-.loggedIn h1 {
-  margin: 0;
+.navigation-bar {
+  display: flex;
+  position: fixed;
+  top: 0;
+  padding: 1em;
+  width: 90vw;
+  justify-content: space-around;
+  list-style-type: none;
+  background-color: var(--dark-gray);
 }
 
-.loggedIn h2 {
-  margin: 0;
+a {
+  color: var(--appwrite-primary);
+  text-decoration: none;
+  transition: filter .15s;
 }
 
-.loggedIn p {
-  margin: 10px;
+a:hover {
+  filter: brightness(0.85);
 }
 
-.error {
-  color: red;
+.content {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.loginSwitchContainer {
-  margin-top: 20px;
-  margin-bottom: 20px;
+.appwrite-logo {
+  width: 18em;
+  margin: auto;
 }
 
-.loginSwitchContainer p {
-  margin: 0;
-  margin-bottom: 5px;
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  justify-content: center;
+  background-color: var(--dark-gray);
+}
+
+@media screen and (min-width: 768px) {
+  footer {
+    flex-direction: row;
+    gap: 0.25em;
+  }
 }
 ```
-This should leave you with a nice form and style with your brand new login app!
+
+But, remember, this is just an example! You can do it a lot better ;)
 
 ## What next?
 
-Congratulations! You've just created a login page using React and Appwrite! 🥳🥳🥳
-
-If you noticed I left out the Register section for this tutorial and that was intentional. This is where I hand it off to you and allow you to use the techniques and ideas you used creating this project to add your own register page!
+Congratulations! You've just created a login page using React and Appwrite!
 
 Good Luck! If you need any help feel free to join the [Discord](https://discord.gg/ZFwqr3S) or Refer to the [Appwrite Documentation](https://appwrite.io/docs). TIP: [Checkout account create documentation for the web API](https://appwrite.io/docs/client/account#create)
 
