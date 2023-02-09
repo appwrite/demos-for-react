@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
+import { Storage,ID } from 'appwrite';
+import {bucketID} from "../utils"
 
 export default function UploadImage(props) {
   const [loading, setLoading] = useState(false);
   const [uploadFile, setUploadFile] = useState(null);
   const [error, setError] = useState(false);
-
   const processUpload = async (_props) => {
     setLoading(true);
     try {
-      await _props.appwrite.storage.createFile(uploadFile, ['*'], ['*']);
+      const storage=new Storage(_props.appwrite);
+      await storage.createFile(bucketID,ID.unique(),uploadFile);
       setLoading(false);
     } catch (e) {
       setLoading(false);

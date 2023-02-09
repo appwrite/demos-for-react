@@ -36,16 +36,18 @@ This should launch a server on `localhost:3000` with Live Reload.
 With the boilerplate now complete, we can now initialise Appwrite in the project before working on the details page. To keep things clean we will initialise this in it's own file, we will create a folder in `src/` and call it `config` and within this folder we will create the file `index.js`. Within this file go ahead and paste the following code:
 
 ```js
-const Appwrite = require("appwrite"); //Import appwrite
+import { Client, Locale } from "appwrite"; //Import appwrite 
 
-let sdk = new Appwrite();
-sdk
-  .setEndpoint("http://localhost:443/v1") // Your API Endpoint
-  .setProject("[PROJECT ID]") // Your project ID
+const client = new Client();
+const locale = new Locale(client);
+client
+  .setEndpoint("http://localhost/v1") // Your API Endpoint
+  .setProject("632354c21d497895d2dd") // Your project ID
 
-let response = sdk.locale.get();
+let response = locale.get();
 
 export {response};
+
 ```
 
 A deeper inspection of this code can be found in the comments within it,

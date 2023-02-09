@@ -1,10 +1,12 @@
-import { appwrite } from "../config";
+import { Account,Databases,ID } from "appwrite";
+import { client,collectionID,databaseID } from "../config";
 
-const collectionID = "5f69c0a24b1cb";
+const account = new Account(client);
+const database = new Databases(client);
 
 const getUserData = async () => {
   try {
-    return appwrite.account.get();
+    return account.get();
   } catch (e) {
     console.error(e.message);
   }
@@ -12,7 +14,7 @@ const getUserData = async () => {
 
 const login = async (email, password) => {
   try {
-    return appwrite.account.createSession(email, password);
+    return  account.createEmailSession(email, password);
   } catch (e) {
     console.error(e.message);
   }
@@ -20,7 +22,7 @@ const login = async (email, password) => {
 
 const logout = async history => {
   try {
-    await appwrite.account.deleteSession("current");
+    await account.deleteSession("current");
     return history.push("/login");
   } catch (e) {
     console.error(e.message);
@@ -29,11 +31,11 @@ const logout = async history => {
 
 const creatUserDocument = async userData => {
   try {
-    return appwrite.database.createDocument(
+    return database.createDocument(
+      databaseID,
       collectionID,
+      ID.unique(),
       userData,
-      ["*"],
-      ["*"]
     );
   } catch (e) {
     console.error(e.message);
@@ -42,7 +44,7 @@ const creatUserDocument = async userData => {
 
 const getUserDocuments = async () => {
   try {
-    return appwrite.database.listDocuments(collectionID);
+    return database.listDocuments(databaseID,collectionID);
   } catch (e) {
     console.error(e.message);
   }
@@ -50,12 +52,11 @@ const getUserDocuments = async () => {
 
 const updateUserDocument = async ({ documentID, name, email }) => {
   try {
-    return appwrite.database.updateDocument(
+    return database.updateDocument(
+      databaseID,
       collectionID,
       documentID,
       { name, email },
-      ["*"],
-      ["*"]
     );
   } catch (e) {
     console.error(e.message);
@@ -64,7 +65,7 @@ const updateUserDocument = async ({ documentID, name, email }) => {
 
 const deleteUserDocument = async documentID => {
   try {
-    return appwrite.database.deleteDocument(collectionID, documentID);
+    return database.deleteDocument(databaseID,collectionID, documentID);
   } catch (e) {
     console.error(e.message);
   }

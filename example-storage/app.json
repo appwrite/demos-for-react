@@ -10,9 +10,9 @@
       "value": "APP_PROJECT_ID",
       "required": true
     },
-    "REACT_APP_COLLECTION_ID": {
-      "description": "Your Appwrite collection ID",
-      "value": "COLLECTION_ID",
+    "REACT_APP_BUCKET_ID": {
+      "description": "Your Appwrite bucket ID",
+      "value": "BUCKET_ID",
       "required": true
     }
   },
