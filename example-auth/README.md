@@ -1,4 +1,5 @@
 # Appwrite + ReactJS =❤️
+
 This example is to showcase [Appwrite's JS API](https://github.com/appwrite/sdk-for-js) with [React](https://reactjs.org/) by creating a simple login/register page.
 
 ## Prerequisites
@@ -8,29 +9,36 @@ This example is to showcase [Appwrite's JS API](https://github.com/appwrite/sdk-
 - [A locally running appwrite instance](https://appwrite.io/docs/installation).
 
 ## Getting Started
+
 To get started quickly we will use [Vite](https://vitejs.dev/) to create the boilerplate that our code will be built on.
 
 ```shell
 yarn create vite
 cd appwrite-react
 ```
+
 And then follow the creation process, in our case we're going to use the `react-typescript` template.
 
 While we are in the CLI we will also install the Appwrite JS API by running:
+
 ```shell
 yarn add appwrite
 ```
+
 and finally we will launch the React development server with:
+
 ```shell
 yarn dev
 ```
+
 This should launch a server on `localhost:5173` with Live Reload.
 
 ## Introducing the Appwrite SDK
+
 With the boilerplate now complete we can now initialise the Appwrite SDK in the project before working on the login page. To keep things clean we will initialise this in it's own file, we will create this file in `src/` and call it `appwrite.ts`. Within this file go ahead and paste the following code:
 
 ```ts
-import { Client } from "appwrite"
+import { Client } from "appwrite";
 
 const client = new Client()
   .setEndpoint(import.meta.env.VITE_APPWRITE_URL)
@@ -38,6 +46,8 @@ const client = new Client()
 ```
 
 In this codeblock we are using Vite's approach for environment variables. To do this, we're going to create a `.env` file at the root of our project and then populate it with the following information:
+
+NOTE: You can find an example file in this repository as `.env.template`
 
 ```env
 VITE_APPWRITE_URL=<YOUR_API_ENDPOINT>
@@ -47,6 +57,7 @@ VITE_APPWRITE_PROJECT=<YOUR_PROJECT_ID>
 Now, you can export the initialized client or keep the Appwrite functions in this file.
 
 ## Creating the App.tsx
+
 We are now going to replace the `src/App.tsx` with our own. For this example, we're going to use [react-router](https://reactrouter.com/en/main) to develop our SPA.
 
 First of all, install `react-router`
@@ -58,19 +69,19 @@ yarn add react-router-dom@latest
 Then, in our `main.tsx` file:
 
 ```tsx
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App'
-import "./index.css"
-import { BrowserRouter } from "react-router-dom"
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
+import "./index.css";
+import { BrowserRouter } from "react-router-dom";
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
       <App />
     </BrowserRouter>
   </React.StrictMode>
-)
+);
 ```
 
 Great! Now we have a functional router for our SPA.
@@ -78,27 +89,27 @@ Great! Now we have a functional router for our SPA.
 Back to our `App.tsx` file...
 
 ```tsx
-import { Routes, Route } from "react-router-dom"
-import Layout from './components/layout'
-import SignUp from './components/signup'
-import LogIn from './components/login'
-import Home from "./components/home"
+import { Routes, Route } from "react-router-dom";
+import Layout from "./components/layout";
+import SignUp from "./components/signup";
+import LogIn from "./components/login";
+import Home from "./components/home";
 
 function App() {
   return (
     <>
       <Routes>
-        <Route path='/' element={<Layout />}>
+        <Route path="/" element={<Layout />}>
           <Route path="/" element={<Home />} />
-          <Route path='/login' element={<LogIn />} />
-          <Route path='/signup' element={<SignUp />} />
+          <Route path="/login" element={<LogIn />} />
+          <Route path="/signup" element={<SignUp />} />
         </Route>
       </Routes>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
 ```
 
 In this file we're going to just define the routes we want to use. We'll explain them later. But before that, let's write the functions that connect our site with Appwrite.
@@ -114,13 +125,13 @@ So, let's create our functions.
 ```ts
 export const getUserData = async () => {
   try {
-    const account = new Account(client)
-    return account.get()
+    const account = new Account(client);
+    return account.get();
   } catch (error) {
     const appwriteError = error as AppwriteException;
-    throw new Error(appwriteError.message)
+    throw new Error(appwriteError.message);
   }
-}
+};
 ```
 
 This function will get the current user's preferences, but, if there's an error, will throw it as an `AppwriteException`.
@@ -130,13 +141,13 @@ This function will get the current user's preferences, but, if there's an error,
 ```ts
 export const login = async (email: string, password: string) => {
   try {
-    const account = new Account(client)
-    return account.createEmailSession(email, password)
+    const account = new Account(client);
+    return account.createEmailSession(email, password);
   } catch (error) {
     const appwriteError = error as AppwriteException;
-    throw new Error(appwriteError.message)
+    throw new Error(appwriteError.message);
   }
-}
+};
 ```
 
 This function will create a session from the email and password we pass to it, if they get a match in the database. If not, throws an `AppwriteException`.
@@ -146,13 +157,13 @@ This function will create a session from the email and password we pass to it, i
 ```ts
 export const logout = async () => {
   try {
-    const account = new Account(client)
-    return account.deleteSession('current')
+    const account = new Account(client);
+    return account.deleteSession("current");
   } catch (error: unknown) {
     const appwriteError = error as AppwriteException;
-    throw new Error(appwriteError.message)
+    throw new Error(appwriteError.message);
   }
-}
+};
 ```
 
 This function will logout the user deleting the current session, throwing an `AppwriteException` if there's an error.
@@ -162,21 +173,21 @@ This function will logout the user deleting the current session, throwing an `Ap
 ```ts
 export const register = async (email: string, password: string) => {
   try {
-    const account = new Account(client)
-    return account.create('unique()', email, password)
+    const account = new Account(client);
+    return account.create("unique()", email, password);
   } catch (error) {
     const appwriteError = error as AppwriteException;
-    throw new Error(appwriteError.message)
+    throw new Error(appwriteError.message);
   }
-}
+};
 ```
 
 This function will create a new user from their email and password. Note the `'unique()'` parameter, as it's explained in Appwrite docs, if we aren't using a custom ID generating solution, using this key phrase will tell Appwrite to generate a random one.
 
 And that's all!, you can tell that all of our functions are asynchronous, and that's because we don't want to block the main execution thread while asking the server something and freeze all the site.
 
-
 ## Creating the pages
+
 Now we're ready to do some React stuff. Let's get there.
 
 ### Log in page
@@ -185,45 +196,43 @@ In our `src/components` folder, we create a new `login.tsx` file and write the f
 
 ```tsx
 import { FormEvent, useState } from "react";
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import { login } from "../appwrite";
 
 export default function LogIn() {
   const [email, setEmail] = useState<string>();
   const [password, setPassword] = useState<string>();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!email) {
-      alert('Email is required.')
+      alert("Email is required.");
       return;
     }
 
     if (!password) {
-      alert('Password is required.')
+      alert("Password is required.");
       return;
     }
 
     login(email, password)
-      .then((account) => alert(`Successfully logged in from: ${account.osName}`))
-      .finally(() => navigate('/'))
-  }
+      .then((account) =>
+        alert(`Successfully logged in from: ${account.osName}`)
+      )
+      .finally(() => navigate("/"));
+  };
 
   return (
     <form className="form" onSubmit={handleSubmit}>
-      <label htmlFor="email">
-        Email
-      </label>
+      <label htmlFor="email">Email</label>
       <input
         id="email"
         type="email"
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <label htmlFor="password">
-        Password
-      </label>
+      <label htmlFor="password">Password</label>
       <input
         id="password"
         type="password"
@@ -232,7 +241,7 @@ export default function LogIn() {
 
       <button type="submit">Log In</button>
     </form>
-  )
+  );
 }
 ```
 
@@ -253,37 +262,35 @@ export default function SignUp() {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!email) {
-      alert('Email is required.')
+      alert("Email is required.");
       return;
     }
 
     if (!password) {
-      alert('Password is required.')
+      alert("Password is required.");
       return;
     }
 
     if (password.length < 8) {
-      alert('Password must be at least 8 characters long.')
+      alert("Password must be at least 8 characters long.");
       return;
     }
 
-    register(email, password).then((account) => alert(`Successfully created account with ID: ${account.$id}`))
-  }
+    register(email, password).then((account) =>
+      alert(`Successfully created account with ID: ${account.$id}`)
+    );
+  };
 
   return (
     <form className="form" onSubmit={handleSubmit}>
-      <label htmlFor="email">
-        Email
-      </label>
+      <label htmlFor="email">Email</label>
       <input
         id="email"
         type="email"
         onChange={(e) => setEmail(e.target.value)}
       />
 
-      <label htmlFor="password">
-        Password
-      </label>
+      <label htmlFor="password">Password</label>
       <input
         id="password"
         type="password"
@@ -292,7 +299,7 @@ export default function SignUp() {
 
       <button type="submit">Sign up</button>
     </form>
-  )
+  );
 }
 ```
 
@@ -304,30 +311,30 @@ If you want, you can create a custom form component to avoid repeating code.
 
 ```tsx
 import { Models } from "appwrite";
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getUserData, logout } from "../appwrite";
 
 export default function Home() {
-  const navigate = useNavigate()
-  const [user, setUser] = useState<Models.Account<Models.Preferences>>()
+  const navigate = useNavigate();
+  const [user, setUser] = useState<Models.Account<Models.Preferences>>();
 
   useEffect(() => {
     getUserData()
       .then((account) => setUser(account))
-      .catch((error) => navigate('/login'))
-  }, [])
+      .catch((error) => navigate("/login"));
+  }, []);
 
-  const handleLogOut = () => logout().then(() => navigate('/login'))
+  const handleLogOut = () => logout().then(() => navigate("/login"));
 
-  if (!user) return <p>You aren't logged in.</p>
+  if (!user) return <p>You aren't logged in.</p>;
 
   return (
     <div>
       <p>Logged in as {user.email}</p>
       <button onClick={handleLogOut}>Log out</button>
     </div>
-  )
+  );
 }
 ```
 
@@ -336,9 +343,9 @@ Our home page is only accessible by authenticated users, as you can see in our `
 ### Layout
 
 ```tsx
-import { Outlet, Link } from "react-router-dom"
-import appwriteLogo from "../../public/appwrite.svg"
-import Footer from "./footer"
+import { Outlet, Link } from "react-router-dom";
+import appwriteLogo from "../../public/appwrite.svg";
+import Footer from "./footer";
 
 export default function Layout() {
   return (
@@ -366,8 +373,8 @@ export default function Layout() {
       </section>
 
       <Footer />
-    </main >
-  )
+    </main>
+  );
 }
 ```
 
@@ -375,8 +382,8 @@ This is not really a page but a template of how our pages are displayed. We crea
 
 And that's it! You now have a functional SPA to authenticate your users and allow them to create their accounts.
 
-
 ## Adding some style
+
 Now, this is all cool but it doesn't look good. You can use whatever CSS solution you want, like Tailwind, vanilla-extract, Stitches, Chakra, etc. For this example, I just used some of the Vite's defaults and added some classes:
 
 ```css
@@ -385,7 +392,7 @@ Now, this is all cool but it doesn't look good. You can use whatever CSS solutio
   font-size: 16px;
   line-height: 24px;
   font-weight: 400;
-  color: #FFF;
+  color: #fff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -394,7 +401,7 @@ Now, this is all cool but it doesn't look good. You can use whatever CSS solutio
   -webkit-text-size-adjust: 100%;
 
   --dark-gray: #242424;
-  --appwrite-primary: #f02e65
+  --appwrite-primary: #f02e65;
 }
 
 html {
@@ -444,7 +451,7 @@ button:focus-visible {
 a {
   color: var(--appwrite-primary);
   text-decoration: none;
-  transition: filter .15s;
+  transition: filter 0.15s;
 }
 
 a:hover {

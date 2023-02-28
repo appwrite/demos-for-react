@@ -1,6 +1,6 @@
-import { Outlet, Link } from "react-router-dom"
-import appwriteLogo from "../../public/appwrite.svg"
-import Footer from "./footer"
+import { Outlet, Link } from "react-router-dom";
+import appwriteLogo from "../../public/appwrite.svg";
+import Footer from "./footer";
 
 export default function Layout() {
   return (
@@ -28,6 +28,6 @@ export default function Layout() {
       </section>
 
       <Footer />
-    </main >
-  )
+    </main>
+  );
 }

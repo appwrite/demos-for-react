@@ -1,4 +1,4 @@
-import { Account, AppwriteException, Client, ID } from "appwrite"
+import { Account, AppwriteException, Client, ID } from "appwrite";
 
 const client = new Client()
   .setEndpoint(import.meta.env.VITE_APPWRITE_URL)
@@ -6,42 +6,42 @@ const client = new Client()
 
 export const getUserData = async () => {
   try {
-    const account = new Account(client)
-    return account.get()
+    const account = new Account(client);
+    return account.get();
   } catch (error) {
     const appwriteError = error as AppwriteException;
-    throw new Error(appwriteError.message)
+    throw new Error(appwriteError.message);
   }
-}
+};
 
 export const login = async (email: string, password: string) => {
   try {
-    const account = new Account(client)
-    return account.createEmailSession(email, password)
+    const account = new Account(client);
+    return account.createEmailSession(email, password);
   } catch (error) {
     const appwriteError = error as AppwriteException;
-    throw new Error(appwriteError.message)
+    throw new Error(appwriteError.message);
   }
-}
+};
 
 export const logout = async () => {
   try {
-    const account = new Account(client)
-    return account.deleteSession('current')
+    const account = new Account(client);
+    return account.deleteSession("current");
   } catch (error: unknown) {
     const appwriteError = error as AppwriteException;
-    throw new Error(appwriteError.message)
+    throw new Error(appwriteError.message);
   }
-}
+};
 
 export const register = async (email: string, password: string) => {
   try {
-    const account = new Account(client)
-    return account.create(ID.unique(), email, password)
+    const account = new Account(client);
+    return account.create(ID.unique(), email, password);
   } catch (error) {
     const appwriteError = error as AppwriteException;
-    throw new Error(appwriteError.message)
+    throw new Error(appwriteError.message);
   }
-}
+};
 
 export default client;
