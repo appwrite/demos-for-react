@@ -29,17 +29,24 @@ We need to make a few configuration changes to your Appwrite server.
 
 3. Add a new Web App to the project and enter your website's endpoint (`localhost, <project-name>.vercel.app etc`)
 
-    ![Create Web App](https://user-images.githubusercontent.com/20852629/113019434-3c27c900-919f-11eb-997c-1da5a8303ceb.png)
-    
 4. Click **Storage** in the left navigation menu to create a new bucket.
   * Give the bucket a suitable name, for example, `user-images`, and click **Create**.
-  * Make a note of the **Bucket ID** on the right of the Settings page.
-  * Scroll down the Settings page, and click **Add Role**. 
-  * In the **Role** dropdown, select `users`, and enable the **Create** permission.
-  * Enable **File Security**.
-  * Click **Update** to update the bucket's settings.
+  * Click the **Bucket ID** button, next to the bucket name, to copy the bucket's ID to the clipboard. You'll use it when you deploy the front end, in a moment.
 
-    <img width="642" alt="Bucket Settings" src="https://user-images.githubusercontent.com/723517/195677596-f52fd8d0-c94c-4670-9bfb-46565e9b899f.png">
+    ![Bucket ID](https://user-images.githubusercontent.com/3102249/218834227-adf0f325-9094-4a1b-9a00-3a63623dea7e.png)
+
+  * Open the **Settings** tab, then scroll down to **Update Permissions**. Click **Add a role to get started**.
+  * In the **Role** dropdown, select `All users`, and enable the **Create** permission.
+
+    ![Update Permissions](https://user-images.githubusercontent.com/3102249/218834725-e8e57649-d6d0-423a-86e3-e99cf09aede4.png)
+
+    ![Create permission for Users](https://user-images.githubusercontent.com/3102249/218834822-9fc81ccf-cde4-4839-a1a4-ba6b317dde38.png)
+
+  * Enable **File Security**.
+
+    ![Update File Security](https://user-images.githubusercontent.com/3102249/218834884-33a08b80-5a58-449d-aff8-7dd8fb8a6911.png)
+
+  * Click **Update** to update the bucket's settings.
 
 ## 🚀 Deploy the Front End
 
@@ -47,7 +54,7 @@ You have two options to deploy the front-end and we will cover both of them here
 
 * `REACT_APP_ENDPOINT` - Your Appwrite endpoint
 * `REACT_APP_PROJECT` - Your Appwrite project ID
-* `REACT_APP_BUCKET_ID` - The Appwrite bucket ID you noted in the previous step
+* `REACT_APP_BUCKET_ID` - The Appwrite bucket ID you copied in the previous step
 
 ### **Deploy to a Static Hosting Provider**
 
