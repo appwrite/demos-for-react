@@ -1,0 +1,25 @@
+{
+  "name": "server-side-rendering-nextjs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@appwrite.io/pink": "^0.2.0",
+    "@appwrite.io/pink-icons": "^0.2.0",
+    "luke-node-appwrite-ssr": "^0.0.5",
+    "next": "14.0.4",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "typescript": "^5"
+  }
+}
