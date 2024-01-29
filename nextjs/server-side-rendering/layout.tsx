@@ -22,11 +22,11 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className="theme-dark">
+    <html lang="en">
       <head>
         <link rel="icon" href={Icon.src} />
       </head>
-      <body>
+      <body className="theme-dark">
         <main className="grid-1-1 is-full-page" id="main">
           <section className="u-flex u-flex-vertical" style={bgStyle}>
             <div className="tag-line is-not-mobile">
