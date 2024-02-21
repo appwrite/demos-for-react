@@ -1,6 +1,6 @@
 import {
   SESSION_COOKIE,
-  createAppwriteClient,
+  createSessionClient,
   getLoggedInUser,
 } from "@/lib/server/appwrite";
 import { redirect } from "next/navigation";
@@ -16,7 +16,7 @@ function getInitials(name: string) {
 async function signOut() {
   "use server";
 
-  const { account } = createAppwriteClient(headers());
+  const { account } = createSessionClient(headers());
 
   cookies().delete(SESSION_COOKIE);
   await account.deleteSession("current");
@@ -25,7 +25,7 @@ async function signOut() {
 }
 
 export default async function HomePage() {
-  const { account } = createAppwriteClient(headers());
+  const { account } = createSessionClient(headers());
 
   const user = await getLoggedInUser(account);
   if (!user) redirect("/signin");

@@ -1,10 +1,10 @@
-import { signInWithGithub } from "@/lib/oauth";
+import { signInWithGithub } from "@/lib/server/oauth";
 import {
   SESSION_COOKIE,
-  createAppwriteClient,
+  createAdminClient,
   getLoggedInUser,
 } from "@/lib/server/appwrite";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 async function signInWithEmail(formData: FormData) {
@@ -13,8 +13,7 @@ async function signInWithEmail(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  const { account } = createAppwriteClient(headers());
-
+  const { account } = createAdminClient();
   const session = await account.createEmailPasswordSession(email, password);
 
   cookies().set(SESSION_COOKIE, session.secret, {
@@ -28,7 +27,7 @@ async function signInWithEmail(formData: FormData) {
 }
 
 export default async function SignInPage() {
-  const { account } = createAppwriteClient(headers());
+  const { account } = createAdminClient();
 
   const user = await getLoggedInUser(account);
   if (user) redirect("/account");
@@ -104,14 +103,15 @@ export default async function SignInPage() {
             </li>
             <span className="with-separators eyebrow-heading-3">or</span>
             <li className="form-item">
-              <button
-                className="button is-github is-full-width"
-                onClick={signInWithGithub}
-                type="button"
-              >
-                <span className="icon-github" aria-hidden="true" />
-                <span className="text">Sign in with GitHub</span>
-              </button>
+              <form action={signInWithGithub}>
+                <button
+                  className="button is-github is-full-width"
+                  type="submit"
+                >
+                  <span className="icon-github" aria-hidden="true" />
+                  <span className="text">Sign in with GitHub</span>
+                </button>
+              </form>
             </li>
           </ul>
         </form>

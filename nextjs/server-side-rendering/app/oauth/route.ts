@@ -1,4 +1,4 @@
-import { SESSION_COOKIE, createAppwriteClient } from "@/lib/server/appwrite";
+import { SESSION_COOKIE, createAdminClient } from "@/lib/server/appwrite";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     return new NextResponse("OAuth2 did not provide token", { status: 400 });
   }
 
-  const { account } = createAppwriteClient(request.headers);
+  const { account } = createAdminClient();
   const session = await account.createSession(userId, secret);
 
   if (!session || !session.secret) {

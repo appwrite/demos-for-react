@@ -1,7 +1,8 @@
-import { signInWithGithub } from "@/lib/oauth";
+import { signInWithGithub } from "@/lib/server/oauth";
 import {
   SESSION_COOKIE,
-  createAppwriteClient,
+  createAdminClient,
+  createSessionClient,
   getLoggedInUser,
 } from "@/lib/server/appwrite";
 import { ID } from "luke-node-appwrite-ssr";
@@ -15,7 +16,7 @@ async function signUpWithEmail(formData: FormData) {
   const password = formData.get("password") as string;
   const name = formData.get("name") as string;
 
-  const { account } = createAppwriteClient(headers());
+  const { account } = createAdminClient();
 
   await account.create(ID.unique(), email, password, name);
   const session = await account.createEmailPasswordSession(email, password);
@@ -31,7 +32,7 @@ async function signUpWithEmail(formData: FormData) {
 }
 
 export default async function SignUpPage() {
-  const { account } = createAppwriteClient(headers());
+  const { account } = createSessionClient(headers());
 
   const user = await getLoggedInUser(account);
   if (user) redirect("/account");
@@ -125,14 +126,15 @@ export default async function SignUpPage() {
             </li>
             <span className="with-separators eyebrow-heading-3">or</span>
             <li className="form-item">
-              <button
-                className="button is-github is-full-width"
-                type="button"
-                onClick={signInWithGithub}
-              >
-                <span className="icon-github" aria-hidden="true" />
-                <span className="text">Sign up with GitHub</span>
-              </button>
+              <form action={signInWithGithub}>
+                <button
+                  className="button is-github is-full-width"
+                  type="submit"
+                >
+                  <span className="icon-github" aria-hidden="true" />
+                  <span className="text">Sign up with GitHub</span>
+                </button>
+              </form>
             </li>
           </ul>
         </form>
