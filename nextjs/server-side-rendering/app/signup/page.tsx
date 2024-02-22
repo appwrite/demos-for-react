@@ -5,7 +5,7 @@ import {
   createSessionClient,
   getLoggedInUser,
 } from "@/lib/server/appwrite";
-import { ID } from "luke-node-appwrite-ssr";
+import { ID } from "node-appwrite";
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 
