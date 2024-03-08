@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@appwrite.io/pink": "^0.8.0",
+    "@appwrite.io/pink-icons": "^0.8.0",
     "next": "14.0.4",
     "node-appwrite": "^12.0.0",
     "react": "^18",

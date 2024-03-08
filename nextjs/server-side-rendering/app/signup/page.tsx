@@ -6,7 +6,7 @@ import {
   getLoggedInUser,
 } from "@/lib/server/appwrite";
 import { ID } from "node-appwrite";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 async function signUpWithEmail(formData: FormData) {
@@ -32,7 +32,7 @@ async function signUpWithEmail(formData: FormData) {
 }
 
 export default async function SignUpPage() {
-  const { account } = createSessionClient(headers());
+  const { account } = createSessionClient();
 
   const user = await getLoggedInUser(account);
   if (user) redirect("/account");

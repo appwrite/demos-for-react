@@ -8,7 +8,7 @@ export function createSessionClient() {
     .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
     .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
 
-  const session = cookies().get(SESSION_COOKIE);
+  const session = cookies().get(SESSION_COOKIE)?.value;
   if (session) {
     client.setSession(session);
   }
@@ -24,7 +24,7 @@ export function createAdminClient() {
   const client = new Client()
     .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
     .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!)
-    .setKey(process.env.NEXT_APPWRITE_KEY);
+    .setKey(process.env.NEXT_APPWRITE_KEY!);
 
   return {
     get account() {
