@@ -1,16 +1,14 @@
 import { Client, Account, Models } from "node-appwrite";
-import { parseCookie } from "next/dist/compiled/@edge-runtime/cookies";
-import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
+import { cookies } from "next/headers";
 
 export const SESSION_COOKIE = "a_session";
 
-export function createSessionClient(headers: ReadonlyHeaders) {
+export function createSessionClient() {
   const client = new Client()
     .setEndpoint(process.env.NEXT_PUBLIC_APPWRITE_ENDPOINT!)
     .setProject(process.env.NEXT_PUBLIC_APPWRITE_PROJECT_ID!);
 
-  const cookies = parseCookie(headers.get("cookie") ?? "");
-  const session = cookies.get(SESSION_COOKIE);
+  const session = cookies().get(SESSION_COOKIE);
   if (session) {
     client.setSession(session);
   }
