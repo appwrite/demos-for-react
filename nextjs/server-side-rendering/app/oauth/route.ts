@@ -1,6 +1,7 @@
-import { SESSION_COOKIE, createAdminClient } from "@/lib/server/appwrite";
+import { createAdminClient } from "@/lib/server/appwrite";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { SESSION_COOKIE } from "@/lib/server/const";
 
 export async function GET(request: NextRequest) {
   const userId = request.nextUrl.searchParams.get("userId");
@@ -10,7 +11,7 @@ export async function GET(request: NextRequest) {
     return new NextResponse("OAuth2 did not provide token", { status: 400 });
   }
 
-  const { account } = createAdminClient();
+  const { account } = await createAdminClient();
   const session = await account.createSession(userId, secret);
 
   if (!session || !session.secret) {

@@ -1,10 +1,6 @@
 import { signInWithGithub } from "@/lib/server/oauth";
-import {
-  SESSION_COOKIE,
-  createAdminClient,
-  createSessionClient,
-  getLoggedInUser,
-} from "@/lib/server/appwrite";
+import { createAdminClient, getLoggedInUser } from "@/lib/server/appwrite";
+import { SESSION_COOKIE } from "@/lib/server/const";
 import { ID } from "node-appwrite";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -16,7 +12,7 @@ async function signUpWithEmail(formData: FormData) {
   const password = formData.get("password") as string;
   const name = formData.get("name") as string;
 
-  const { account } = createAdminClient();
+  const { account } = await createAdminClient();
 
   await account.create(ID.unique(), email, password, name);
   const session = await account.createEmailPasswordSession(email, password);
@@ -32,9 +28,7 @@ async function signUpWithEmail(formData: FormData) {
 }
 
 export default async function SignUpPage() {
-  const { account } = createSessionClient();
-
-  const user = await getLoggedInUser(account);
+  const user = await getLoggedInUser();
   if (user) redirect("/account");
 
   return (
@@ -125,18 +119,14 @@ export default async function SignUpPage() {
               </button>
             </li>
             <span className="with-separators eyebrow-heading-3">or</span>
-            <li className="form-item">
-              <form action={signInWithGithub}>
-                <button
-                  className="button is-github is-full-width"
-                  type="submit"
-                >
-                  <span className="icon-github" aria-hidden="true" />
-                  <span className="text">Sign up with GitHub</span>
-                </button>
-              </form>
-            </li>
+            <li className="form-item"></li>
           </ul>
+        </form>
+        <form action={signInWithGithub}>
+          <button className="button is-github is-full-width" type="submit">
+            <span className="icon-github" aria-hidden="true" />
+            <span className="text">Sign up with GitHub</span>
+          </button>
         </form>
       </div>
       <ul className="inline-links is-center is-with-sep u-margin-block-start-32">

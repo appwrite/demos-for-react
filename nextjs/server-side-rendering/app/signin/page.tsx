@@ -1,11 +1,8 @@
 import { signInWithGithub } from "@/lib/server/oauth";
-import {
-  SESSION_COOKIE,
-  createAdminClient,
-  getLoggedInUser,
-} from "@/lib/server/appwrite";
+import { createAdminClient, getLoggedInUser } from "@/lib/server/appwrite";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { SESSION_COOKIE } from "@/lib/server/const";
 
 async function signInWithEmail(formData: FormData) {
   "use server";
@@ -13,7 +10,9 @@ async function signInWithEmail(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  const { account } = createAdminClient();
+  console.table({ email, password });
+
+  const { account } = await createAdminClient();
   const session = await account.createEmailPasswordSession(email, password);
 
   cookies().set(SESSION_COOKIE, session.secret, {
@@ -27,9 +26,7 @@ async function signInWithEmail(formData: FormData) {
 }
 
 export default async function SignInPage() {
-  const { account } = createAdminClient();
-
-  const user = await getLoggedInUser(account);
+  const user = await getLoggedInUser();
   if (user) redirect("/account");
 
   return (
@@ -64,6 +61,7 @@ export default async function SignInPage() {
               <div className="input-text-wrapper">
                 <input
                   id="email"
+                  name="email"
                   placeholder="Email"
                   type="email"
                   className="input-text"
@@ -81,6 +79,7 @@ export default async function SignInPage() {
               >
                 <input
                   id="password"
+                  name="password"
                   placeholder="Password"
                   minLength={8}
                   type="password"
@@ -102,18 +101,14 @@ export default async function SignInPage() {
               </button>
             </li>
             <span className="with-separators eyebrow-heading-3">or</span>
-            <li className="form-item">
-              <form action={signInWithGithub}>
-                <button
-                  className="button is-github is-full-width"
-                  type="submit"
-                >
-                  <span className="icon-github" aria-hidden="true" />
-                  <span className="text">Sign in with GitHub</span>
-                </button>
-              </form>
-            </li>
+            <li className="form-item"></li>
           </ul>
+        </form>
+        <form action={signInWithGithub}>
+          <button className="button is-github is-full-width" type="submit">
+            <span className="icon-github" aria-hidden="true" />
+            <span className="text">Sign up with GitHub</span>
+          </button>
         </form>
       </div>
       <ul className="inline-links is-center is-with-sep u-margin-block-start-32">

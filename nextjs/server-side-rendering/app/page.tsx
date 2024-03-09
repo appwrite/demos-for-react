@@ -1,13 +1,9 @@
-import { createSessionClient, getLoggedInUser } from "@/lib/server/appwrite";
+import { getLoggedInUser } from "@/lib/server/appwrite";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function Home() {
-  const { account } = createSessionClient();
-
-  const user = await getLoggedInUser(account);
+  const user = await getLoggedInUser();
   if (!user) redirect("/signin");
-
   redirect("/account");
 }

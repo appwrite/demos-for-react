@@ -1,11 +1,11 @@
 "use server";
 
-import { NextResponse } from "next/server";
 import { createAdminClient } from "./appwrite";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export async function signInWithGithub() {
-  const { account } = createAdminClient();
+  const { account } = await createAdminClient();
 
   const origin = headers().get("origin");
   const successUrl = `${origin}/oauth`;
@@ -17,5 +17,5 @@ export async function signInWithGithub() {
     failureUrl
   );
 
-  return NextResponse.redirect(redirectUrl);
+  redirect(redirectUrl);
 }
