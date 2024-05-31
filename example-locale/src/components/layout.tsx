@@ -1,6 +1,5 @@
 import { Outlet, Link } from "react-router-dom";
 import appwriteLogo from "../../public/appwrite.svg";
-import Footer from "./footer";
 
 export default function Layout() {
   return (
@@ -11,10 +10,22 @@ export default function Layout() {
             <Link to="/">Home</Link>
           </li>
           <li>
-            <Link to="/login">Log In</Link>
+            <Link to="/countries">Countries</Link>
           </li>
           <li>
-            <Link to="/signup">Sign Up</Link>
+            <Link to="/eu-countries">EU Countries</Link>
+          </li>
+          <li>
+            <Link to="/phone-codes">Phone Codes</Link>
+          </li>
+          <li>
+            <Link to="/continents">Continents</Link>
+          </li>
+          <li>
+            <Link to="/currencies">Currencies</Link>
+          </li>
+          <li>
+            <Link to="/languages">Languages</Link>
           </li>
         </ul>
       </nav>
@@ -26,8 +37,6 @@ export default function Layout() {
       <section className="content">
         <Outlet />
       </section>
-
-      <Footer />
     </main>
   );
 }
