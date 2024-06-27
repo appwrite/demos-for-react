@@ -27,5 +27,7 @@ export async function GET(request: NextRequest) {
     secure: true,
   });
 
-  return NextResponse.redirect(`${request.nextUrl.origin}/account`);
+  const response = NextResponse.redirect(`${request.nextUrl.origin}/account`);
+  response.cookies.set(SESSION_COOKIE, session.secret);
+  return response;
 }
