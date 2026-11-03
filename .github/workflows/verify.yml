@@ -1,0 +1,13 @@
+name: verify
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    uses: appwrite/renovate-config/.github/workflows/verify.yml@3afeb943b6d52145c7b5ebc6e74833bdf1ade094 # main
